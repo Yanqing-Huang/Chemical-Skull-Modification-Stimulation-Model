@@ -7,7 +7,7 @@ SD 大鼠颅骨化学改性与 SSVEP 刺激的理论先验仿真模型（待体�
 ### 在线交互网页（推荐）
 直接打开 GitHub Pages 上的参数化仿真页面：
 
-https://yanqing-huang.github.io/Chemical-Skull-Modification-Stimulation-Model/website/parameter-simulation.html
+https://yanqing-huang.github.io/Chemical-Skull-Modification-Stimulation-Model/
 
 所有参数（频率、试剂类型、浓度、浸泡时间、几何、孔隙率、动力学、电学）实时可调节，点击"运行仿真"即可看到脱钙与阻抗响应。
 
