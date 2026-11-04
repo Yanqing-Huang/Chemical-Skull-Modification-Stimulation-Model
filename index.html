@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:,">
 <title>SD 大鼠颅骨化学改性 · 仿真平台</title>
 <script src="echarts.min.js"></script>
 <script src="three.min.js"></script>
@@ -23,6 +24,7 @@
   main{padding:22px 28px;max-width:1400px;margin:0 auto}
   .view{display:none}.view.show{display:block}
   .grid{display:grid;gap:16px}
+  .grid>*{min-width:0}
   .g2{grid-template-columns:1fr 1fr}
   .g3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
   .g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
@@ -30,7 +32,7 @@
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
   .card h3{font-size:15px;margin-bottom:10px;color:var(--txt)}
   .card h3 small{color:var(--sub);font-weight:400;margin-left:8px;font-size:12px}
-  .chart{width:100%;height:360px}
+  .chart{width:100%;height:360px;overflow:hidden}
   .chart-tall{width:100%;height:420px}
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
@@ -54,6 +56,13 @@
   .swatch{width:14px;height:14px;border-radius:3px;display:inline-block}
   .note{background:var(--panel2);border-left:3px solid var(--warn);padding:10px 14px;border-radius:6px;font-size:13px;color:var(--sub);margin-top:12px}
   .hint{font-size:11px;color:var(--sub);margin-top:2px}
+  .protocol{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .protocol button.active{border-color:var(--acc);color:var(--acc);background:rgba(53,196,141,.08)}
+  .protocol-track{height:5px;background:var(--panel2);border-radius:4px;margin-top:12px;overflow:hidden}
+  .protocol-fill{height:100%;width:0;background:linear-gradient(90deg,#a06bc2,#3aa0ff 55%,#f0a53a);transition:width .12s linear}
+  #stage-progress{width:100%;accent-color:var(--acc2);margin:8px 0 2px}
+  #stage-readout{font-size:12px;color:var(--sub);line-height:1.6;min-height:20px}
+  .model-note{font-size:11px;color:var(--sub);line-height:1.6;margin-top:8px}
   footer{padding:16px 28px;color:var(--sub);font-size:12px;border-top:1px solid var(--line)}
   footer a{color:var(--acc2)}
 </style>
@@ -96,12 +105,12 @@
       <div class="ctl">
         <label>试剂类型</label>
         <select id="in-reagent">
-          <option value="edta" selected>EDTA（螯合脱钙）</option>
+          <option value="edta">EDTA（螯合脱钙）</option>
           <option value="acetic">乙酸（酸溶解）</option>
           <option value="urea">尿素（溶胀）</option>
-          <option value="seq">乙酸预处理 → EDTA</option>
+          <option value="seq" selected>三步时序：乙酸 → EDTA → 尿素</option>
         </select>
-        <div class="hint" id="reagent-hint">EDTA：螯合脱钙</div>
+        <div class="hint" id="reagent-hint">50% 乙酸 5 min → EDTA → 饱和尿素 10 min；阶段间漂洗</div>
       </div>
       <div class="ctl">
         <label>浓度 mol/L <span id="v-cmain"></span></label>
@@ -137,23 +146,29 @@
 
     <!-- 3D 模型 -->
     <div class="card">
-      <h3>3D 颅骨模型 <small>拖动旋转 · 滚轮缩放</small></h3>
-      <div class="canvas-wrap"><div id="three-container" style="width:100%;height:420px"></div></div>
-      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
+      <h3>三维颅盖网状剖体 <small>拖动旋转 · 滚轮缩放</small></h3>
+      <div class="canvas-wrap"><div id="three-container" style="width:100%;height:460px"></div></div>
+      <div class="protocol">
+        <button class="btn-outline active" style="padding:4px 10px;font-size:12px" data-mode="anatomy" id="cm-an">解剖配色</button>
         <button class="btn-outline" style="padding:4px 10px;font-size:12px" data-mode="calcium" id="cm-ca">钙剩余</button>
         <button class="btn-outline" style="padding:4px 10px;font-size:12px" data-mode="porosity" id="cm-po">孔隙率</button>
         <button class="btn-outline" style="padding:4px 10px;font-size:12px" data-mode="conc" id="cm-co">试剂浓度</button>
-        <span style="margin-left:8px;font-size:12px;color:var(--sub)">阶段:</span>
-        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="stage-0">原始</button>
-        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="stage-1">乙酸</button>
-        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="stage-2">EDTA</button>
-        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="stage-3">尿素</button>
+        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="cut-btn">剖口：开</button>
+        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="explode-btn">分层展开</button>
       </div>
-      <div class="legend">
-        <span><span class="swatch" style="background:#35c48d"></span>低</span>
-        <span><span class="swatch" style="background:#f0a53a"></span>高</span>
-        <span style="margin-left:auto">上→下：外板(密质骨) / 板障(松质骨·网状) / 内板(密质骨)</span>
+      <div class="protocol" id="stage-buttons">
+        <span style="font-size:12px;color:var(--sub)">处理顺序</span>
+        <button class="btn-outline active" style="padding:4px 10px;font-size:12px" id="stage-0">原始</button>
+        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="stage-1">① 乙酸</button>
+        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="stage-2">② EDTA</button>
+        <button class="btn-outline" style="padding:4px 10px;font-size:12px" id="stage-3">③ 尿素</button>
+        <button class="btn" style="padding:5px 12px;font-size:12px;margin-left:auto" id="play-seq">播放顺序浸入</button>
       </div>
+      <div class="protocol-track"><div class="protocol-fill" id="protocol-fill"></div></div>
+      <input type="range" id="stage-progress" min="0" max="1000" value="1000" aria-label="三步处理时间进度">
+      <div id="stage-readout">尿素阶段末态 · 45 min · 尿素只输运不消耗固相钙</div>
+      <div class="model-note">外板/内板：连续密质骨壳与微小骨通道；板障：三维连通骨小梁、骨髓间隙和红色板障静脉。颜色与粒子由同一扩散–反应求解结果驱动，浸入方向为外板 → 板障 → 内板。</div>
+      <div class="model-note">解剖结构依据吴小明论文的三层串联描述及刘澳论文的三明治结构；厚度测量方法参考林婧璇论文。此图为颅盖局部曲面剖体示意，并非个体 CT 重建。</div>
     </div>
   </div>
 
@@ -237,10 +252,11 @@
     <div class="card">
       <h3>参数来源边界</h3>
       <ul style="margin:8px 0 0 16px;line-height:1.8;font-size:13px">
-        <li>人体论文提供<strong>结构方法</strong>，不能直接迁移数值给 SD 大鼠</li>
+        <li>吴小明论文：外板/内板为骨密质，板障为含骨髓与板障静脉的骨松质</li>
+        <li>刘澳论文：外板–板障–内板三明治结构与分层网格思路</li>
+        <li>林婧璇论文：三层厚度测量方法；人体数值不直接迁移给 SD 大鼠</li>
         <li>固定化 PPT 提供 D<sub>e</sub> / Thiele / Biot 方法论</li>
-        <li>所有 SD 大鼠参数标为<strong>推测先验</strong>，保留不确定度范围</li>
-        <li>频率仅作用于电学读出层，不影响脱钙过程</li>
+        <li>所有 SD 大鼠参数标为<strong>推测先验</strong>；频率仅影响电学读出层</li>
       </ul>
     </div>
   </div>
@@ -313,13 +329,14 @@
     return{n:n,dx:dx,li:li,H:H,tau:tau,eps0:eps0,q0:q0,x:xx};}
 
   function runStage(g,p,st,q,samples){var n=g.n;var dt=st.T/160;var steps=Math.max(1,Math.round(st.T/dt));dt=st.T/steps;
+    var nu=st.nu===undefined?1:st.nu;
     var a=new Array(n).fill(0);var snapEvery=Math.max(1,Math.floor(steps/samples));
     var snaps=[{t:0,c:a.slice(),q:q.slice()}];var kf=p.kf*1e3,alpha=p.alpha;
     for(var s=0;s<steps;s++){var eps=new Array(n),De=new Array(n);
       for(var i=0;i<n;i++){eps[i]=Math.max(1e-8,g.eps0[i]+alpha*(g.q0[i]-q[i]));De[i]=st.Db*1e6*eps[i]/g.tau[i];}
       var cOldArr=a.map(function(v,i2){return v/eps[i2];});
       var lo=new Array(n).fill(0),dg=new Array(n),up=new Array(n).fill(0),rhs=new Array(n);
-      for(i=0;i<n;i++){dg[i]=eps[i]/dt+st.nu*st.kr*q[i];rhs[i]=eps[i]*cOldArr[i]/dt;
+      for(i=0;i<n;i++){dg[i]=eps[i]/dt+nu*st.kr*q[i];rhs[i]=eps[i]*cOldArr[i]/dt;
         if(i>0){var Df=2*De[i-1]*De[i]/(De[i-1]+De[i]);var coef=Df/(0.5*(g.dx[i-1]+g.dx[i])*g.dx[i]);lo[i]=-coef;dg[i]+=coef;}
         if(i<n-1){var Df2=2*De[i]*De[i+1]/(De[i]+De[i+1]);var coef2=Df2/(0.5*(g.dx[i]+g.dx[i+1])*g.dx[i]);up[i]=-coef2;dg[i]+=coef2;}}
       var R=1/kf+g.dx[0]/(2*De[0]);var bcoef=1/(R*g.dx[0]);dg[0]+=bcoef;rhs[0]+=bcoef*st.Cb;
@@ -333,22 +350,32 @@
       var em=es/ws;var sigma=p.sigmaMatrix+p.sigmaFluid*Math.pow(em,p.archieM);R+=t/sigma;}return R;}
 
   window.runSim=function(p){var g=buildGrid(p);var R0=resistance(g,p,g.q0);var q0=g.q0.slice();
-    if(p.reagent==='seq'){var a=runStage(g,p,{Cb:8740,Db:p.dAcid,kr:p.kAcid,T:300},q0.slice(),12);var finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,T:p.tSoak*60},a.qFinal.slice(),80);}
-    else if(p.reagent==='edta'){finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,T:p.tSoak*60},q0.slice(),80);}
-    else if(p.reagent==='acetic'){finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dAcid,kr:p.kAcid,T:p.tSoak*60},q0.slice(),80);}
-    else{finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dUrea,kr:0,T:p.tSoak*60},q0.slice(),80);}
-    var qFinal=finalStage.qFinal;var R1=resistance(g,p,qFinal);
+    var defs;
+    if(p.reagent==='seq')defs=[
+      {id:'acid',name:'50% 乙酸预处理',Cb:8740,Db:p.dAcid,kr:p.kAcid,nu:2,T:300},
+      {id:'edta',name:'EDTA 螯合脱钙',Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60},
+      {id:'urea',name:'尿素溶胀',Cb:8000,Db:p.dUrea,kr:0,nu:0,T:600}];
+    else if(p.reagent==='edta')defs=[{id:'edta',name:'EDTA 螯合脱钙',Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60}];
+    else if(p.reagent==='acetic')defs=[{id:'acid',name:'乙酸酸解脱钙',Cb:p.cMain*1000,Db:p.dAcid,kr:p.kAcid,nu:2,T:p.tSoak*60}];
+    else defs=[{id:'urea',name:'尿素溶胀',Cb:p.cMain*1000,Db:p.dUrea,kr:0,nu:0,T:p.tSoak*60}];
+    var stages=[],timeline=[],offset=0,qStart=q0.slice();
+    defs.forEach(function(def,si){var result=runStage(g,p,def,qStart.slice(),si===0?16:40);
+      var stage={id:def.id,name:def.name,Cb:def.Cb,start:offset,duration:def.T,snaps:result.snaps,qFinal:result.qFinal};
+      stages.push(stage);
+      result.snaps.forEach(function(sn,j){if(si>0&&j===0)return;timeline.push({t:offset+sn.t,c:sn.c,q:sn.q,stage:si});});
+      offset+=def.T;qStart=result.qFinal.slice();});
+    var finalStage=stages[stages.length-1];var qFinal=finalStage.qFinal;var R1=resistance(g,p,qFinal);
     var tot=0,nat=0,oTot=0,oNat=0;for(var i=0;i<g.n;i++){tot+=qFinal[i]*g.dx[i];nat+=g.q0[i]*g.dx[i];if(g.li[i]===0){oTot+=qFinal[i]*g.dx[i];oNat+=g.q0[i]*g.dx[i];}}
     var kr=p.reagent==='acetic'?p.kAcid:(p.reagent==='urea'?0:p.kEdta);var Db=p.reagent==='acetic'?p.dAcid:(p.reagent==='urea'?p.dUrea:p.dEdta);
     var phiL=[p.hOuter,p.hDiploe,p.hInner],epsL=[p.epsOuter,p.epsDiploe,p.epsInner],qL=[p.qOuter,p.qDiploe,p.qInner],tauL=[p.tauOuter,p.tauDiploe,p.tauInner];
     var diag=[];for(var L=0;L<3;L++){var De=Db*1e6*epsL[L]/tauL[L];var phi=phiL[L]*Math.sqrt(kr*qL[L]/De);diag.push({layer:L,phi:phi,eta:phi>1e-9?Math.tanh(phi)/phi:1,bi:p.kf*1e3*phiL[L]/De});}
-    return{grid:g,final:finalStage,qFinal:qFinal,R0:R0,R1:R1,caWhole:tot/nat,caOuter:oTot/oNat,diag:diag};};
+    return{grid:g,final:finalStage,stages:stages,timeline:timeline,totalTime:offset,qFinal:qFinal,R0:R0,R1:R1,caWhole:tot/nat,caOuter:oTot/oNat,diag:diag};};
 })();
 
 /* ==================== UI ==================== */
 (function(){
-  var DEF={freq:20,reagent:'edta',cMain:0.1,tSoak:30,hOuter:0.43,hDiploe:0.20,hInner:0.17,epsOuter:0.08,epsDiploe:0.30,epsInner:0.10,tauOuter:4,tauDiploe:2,tauInner:4,qOuter:11000,qDiploe:6000,qInner:10000,kAcid:1e-7,kEdta:5e-6,dAcid:1e-9,dEdta:6e-10,dUrea:1.4e-9,kf:1e-5,alpha:3.2e-5,sigmaFluid:1.5,sigmaMatrix:1e-4,archieM:1.5};
-  var P=Object.assign({},DEF),SIM=null,CM='calcium';
+  var DEF={freq:20,reagent:'seq',cMain:0.1,tSoak:30,hOuter:0.43,hDiploe:0.20,hInner:0.17,epsOuter:0.08,epsDiploe:0.30,epsInner:0.10,tauOuter:4,tauDiploe:2,tauInner:4,qOuter:11000,qDiploe:6000,qInner:10000,kAcid:1e-7,kEdta:5e-6,dAcid:1e-9,dEdta:6e-10,dUrea:1.4e-9,kf:1e-5,alpha:3.2e-5,sigmaFluid:1.5,sigmaMatrix:1e-4,archieM:1.5};
+  var P=Object.assign({},DEF),SIM=null,CM='anatomy';
 
   var sl=[['freq','v-freq',function(v){return v.toFixed(0)+' Hz'},function(v){return v}],
     ['cMain','v-cmain',function(v){return v.toFixed(2)+' mol/L'},function(v){return v}],
@@ -373,7 +400,7 @@
 
   document.getElementById('in-reagent').addEventListener('change',function(){
     P.reagent=this.value;
-    document.getElementById('reagent-hint').textContent={edta:'EDTA：螯合脱钙',acetic:'乙酸：酸溶解',urea:'尿素：溶胀，不耗钙',seq:'50%乙酸预处理 5min → EDTA'}[this.value];});
+    document.getElementById('reagent-hint').textContent={edta:'EDTA：螯合脱钙',acetic:'乙酸：酸溶解',urea:'尿素：溶胀，不耗钙',seq:'50% 乙酸 5 min → EDTA → 饱和尿素 10 min；阶段间漂洗'}[this.value];});
 
   /* Nav switching */
   document.querySelectorAll('nav button').forEach(function(b){
@@ -385,15 +412,15 @@
     });
   });
 
-  /* Three.js 3D anatomical cranial model with WebGL fallback */
+  /* Three.js anatomical calvarial patch: curved compact tables + 3D diploic network */
   var container=document.getElementById('three-container');
-  var scene,camera,renderer,outerGroup,diploeGroup,innerGroup;
-  var outerMesh,innerMesh,diploeMeshes=[],vesselMeshes=[];
-  var LX=3,LY=2,Ht=0.8;
-  var currentStage=0,currentMode='calcium';
-  var webglAvailable=false;
+  var scene,camera,renderer,modelRoot,outerGroup,diploeGroup,innerGroup,labelGroup,bathMesh,particleGroup;
+  var outerMesh,innerMesh,diploeMeshes=[],channelMeshes=[],particles=[];
+  var RX=2.55,RZ=1.82,VS=1.8,Ht=0.8,EXP=0.52,CUT={center:Math.PI/4,width:Math.PI/3};
+  var currentStage=3,currentMode='anatomy',currentState=null,cutaway=true,exploded=true;
+  var playing=false,playStart=0,playTime=0,webglAvailable=false;
+  var stageColors={acid:0xaa72c5,edta:0x3aa0ff,urea:0xf0a53a};
 
-  /* Check WebGL support */
   try{
     var testCanvas=document.createElement('canvas');
     var gl=testCanvas.getContext('webgl')||testCanvas.getContext('experimental-webgl');
@@ -402,170 +429,270 @@
 
   if(webglAvailable){
     try{
-      scene=new THREE.Scene();scene.background=new THREE.Color(0x1f2c42);
-      camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,0.1,100);
-      camera.position.set(6,4,8);camera.lookAt(0,0,0);
-      renderer=new THREE.WebGLRenderer({antialias:true});
+      scene=new THREE.Scene();scene.background=new THREE.Color(0x111c2c);scene.fog=new THREE.Fog(0x111c2c,13,25);
+      camera=new THREE.PerspectiveCamera(36,container.clientWidth/container.clientHeight,0.1,100);
+      camera.position.set(5.6,3.0,6.2);camera.lookAt(0,-0.35,0);
+      renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
       renderer.setSize(container.clientWidth,container.clientHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      container.appendChild(renderer.domElement);
-
-      /* Lighting */
-      scene.add(new THREE.AmbientLight(0x404060,0.6));
-      var dirLight=new THREE.DirectionalLight(0xffffff,0.8);dirLight.position.set(5,10,7);scene.add(dirLight);
-      var dirLight2=new THREE.DirectionalLight(0x8899ff,0.3);dirLight2.position.set(-5,-3,-5);scene.add(dirLight2);
-
-      /* Layer groups */
+      renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+      renderer.outputEncoding=THREE.sRGBEncoding;
+      container.appendChild(renderer.domElement);fitCamera();
+      scene.add(new THREE.HemisphereLight(0xfff0d8,0x182235,0.82));
+      var keyLight=new THREE.DirectionalLight(0xffe5c4,0.9);keyLight.position.set(4,8,6);scene.add(keyLight);
+      var fillLight=new THREE.DirectionalLight(0x8bb8ff,0.42);fillLight.position.set(-5,1,-4);scene.add(fillLight);
+      modelRoot=new THREE.Group();modelRoot.rotation.y=-0.12;scene.add(modelRoot);
       outerGroup=new THREE.Group();diploeGroup=new THREE.Group();innerGroup=new THREE.Group();
-      scene.add(outerGroup);scene.add(diploeGroup);scene.add(innerGroup);
+      modelRoot.add(outerGroup);modelRoot.add(diploeGroup);modelRoot.add(innerGroup);
     }catch(e){
       webglAvailable=false;
-      container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:14px;text-align:center;padding:20px">3D 渲染初始化失败，请使用支持 WebGL 的浏览器。<br>其他功能（参数调节、图表、仿真）仍可正常使用。</div>';
+      container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:14px;text-align:center;padding:20px">3D 渲染初始化失败，请使用支持 WebGL 的浏览器。<br>参数、图表和三步仿真仍可正常使用。</div>';
     }
   }else{
-    container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:14px;text-align:center;padding:20px">您的浏览器不支持 WebGL，无法显示 3D 模型。<br>请使用 Chrome、Firefox 或 Edge 的最新版本。</div>';
+    container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:14px;text-align:center;padding:20px">当前浏览器无法创建 WebGL 场景。<br>请使用最新版 Chrome、Firefox 或 Edge 查看三维网状颅盖。</div>';
   }
 
-  function valScale(v){v=Math.max(0,Math.min(1,v));return{v:0.15+0.85*v,g:0.6+0.3*v,b:0.5-0.3*v};}
-  function layerColors(q){var g=SIM.grid;var vals;
-    if(currentMode==='calcium')vals=q.map(function(v,i){return v/g.q0[i];});
-    else if(currentMode==='porosity')vals=q.map(function(v,i){return(g.eps0[i]+P.alpha*(g.q0[i]-v))/0.6;});
-    else{var last=SIM.final.snaps[SIM.final.snaps.length-1].c,v2=P.cMain*1000;vals=last.map(function(c){return Math.min(1,c/v2);});}
-    var cols=[];for(var L=0;L<3;L++){var r=0,gg=0,b=0,n=0;for(var i=0;i<g.n;i++)if(g.li[i]===L){var c=valScale(vals[i]);r+=c.v;gg+=c.g;b+=c.b;n++;}
-      cols.push({r:r/n,g:gg/n,b:b/n});}return cols;}
+  function hash(n){var x=Math.sin(n*12.9898+78.233)*43758.5453;return x-Math.floor(x);}
+  function normAngle(a){a%=Math.PI*2;return a<0?a+Math.PI*2:a;}
+  function inCut(a){if(!cutaway)return false;var d=Math.atan2(Math.sin(a-CUT.center),Math.cos(a-CUT.center));return Math.abs(d)<CUT.width/2;}
+  function pointAt(rho,theta,depth){return new THREE.Vector3(RX*rho*Math.cos(theta),0.48-0.28*rho*rho-depth*VS,RZ*rho*Math.sin(theta));}
+  function clearGroup(group){if(!group)return;group.traverse(function(o){if(o.geometry)o.geometry.dispose();if(o.material){if(o.material.map)o.material.map.dispose();o.material.dispose();}});group.clear();}
+  function boneMaterial(color){return new THREE.MeshPhongMaterial({color:color,shininess:38,specular:0x393228});}
+  function rodBetween(a,b,r,material){var dir=b.clone().sub(a),len=dir.length();var mesh=new THREE.Mesh(new THREE.CylinderGeometry(r*0.82,r,len,7,1),material);mesh.position.copy(a).add(b).multiplyScalar(0.5);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());return mesh;}
 
-  /* Build outer cortical plate (compact bone) */
-  function buildOuterPlate(){
-    outerGroup.clear();
-    var h=SIM?SIM.grid.H[0]:0.43;
-    var geo=new THREE.BoxGeometry(LX*2,h,LY*2);
-    var col=layerColors(SIM?SIM.qFinal:SIM?SIM.grid.q0:[])[0]||{r:0.5,g:0.7,b:0.4};
-    var mat=new THREE.MeshPhongMaterial({color:new THREE.Color(col.r,col.g,col.b),transparent:true,opacity:0.85,shininess:30});
-    outerMesh=new THREE.Mesh(geo,mat);
-    outerMesh.position.y=Ht/2-h/2;
-    outerGroup.add(outerMesh);
-    /* Add subtle surface texture lines to suggest compact bone */
-    var edges=new THREE.EdgesGeometry(geo);
-    var line=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0x88cc88,transparent:true,opacity:0.3}));
-    line.position.copy(outerMesh.position);outerGroup.add(line);
+  /* Closed curved shell with a removable wedge; vertex depth drives concentration gradients. */
+  function buildPlate(depth0,depth1,layer){
+    var positions=[],depths=[],indices=[],nr=8,nt=72,side,ir,it;
+    var start=cutaway?CUT.center+CUT.width/2:0;
+    var end=cutaway?CUT.center-CUT.width/2+Math.PI*2:Math.PI*2;
+    var stride=(nr+1)*(nt+1);
+    function vid(s,r,t){return s*stride+r*(nt+1)+t;}
+    for(side=0;side<2;side++)for(ir=0;ir<=nr;ir++)for(it=0;it<=nt;it++){
+      var p=pointAt(ir/nr,start+(end-start)*it/nt,side===0?depth0:depth1);
+      positions.push(p.x,p.y,p.z);depths.push(side===0?depth0:depth1);
+    }
+    for(ir=0;ir<nr;ir++)for(it=0;it<nt;it++){
+      var a=vid(0,ir,it),b=vid(0,ir+1,it),c=vid(0,ir+1,it+1),d=vid(0,ir,it+1);
+      indices.push(a,d,b,b,d,c);
+      a=vid(1,ir,it);b=vid(1,ir+1,it);c=vid(1,ir+1,it+1);d=vid(1,ir,it+1);
+      indices.push(a,b,d,b,c,d);
+    }
+    for(it=0;it<nt;it++){
+      var at=vid(0,nr,it),bt=vid(0,nr,it+1),bb=vid(1,nr,it+1),ab=vid(1,nr,it);
+      indices.push(at,bt,ab,bt,bb,ab);
+    }
+    if(cutaway)for(ir=0;ir<nr;ir++){
+      var t0a=vid(0,ir,0),t0b=vid(0,ir+1,0),b0a=vid(1,ir,0),b0b=vid(1,ir+1,0);
+      indices.push(t0a,b0a,t0b,t0b,b0a,b0b);
+      var t1a=vid(0,ir,nt),t1b=vid(0,ir+1,nt),b1a=vid(1,ir,nt),b1b=vid(1,ir+1,nt);
+      indices.push(t1a,t1b,b1a,t1b,b1b,b1a);
+    }
+    var geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+    geo.setAttribute('color',new THREE.Float32BufferAttribute(new Float32Array(positions.length),3));
+    geo.setIndex(indices);geo.computeVertexNormals();
+    var mat=new THREE.MeshPhongMaterial({vertexColors:true,shininess:42,specular:0x40372d,side:THREE.DoubleSide});
+    var mesh=new THREE.Mesh(geo,mat);mesh.userData.depths=depths;mesh.userData.layer=layer;return mesh;
   }
 
-  /* Build diploe (cancellous/spongy bone with trabeculae and marrow spaces) */
+  function buildCompactDetails(group,depth0,depth1,count,seed){
+    for(var i=0;i<count;i++){
+      var rho=Math.sqrt(0.12+0.72*hash(seed+i*3)),theta=hash(seed+i*3+1)*Math.PI*2;
+      if(inCut(theta))continue;
+      var a=pointAt(rho,theta,depth0),b=pointAt(rho,theta,depth1);
+      var mat=new THREE.MeshPhongMaterial({color:0x6f5a43,transparent:true,opacity:0.48});
+      var canal=rodBetween(a,b,0.012,mat);canal.userData.depth=(depth0+depth1)/2;group.add(canal);channelMeshes.push(canal);
+      var ring=new THREE.Mesh(new THREE.TorusGeometry(0.026,0.005,5,12),mat.clone());
+      ring.position.copy(a);ring.rotation.x=Math.PI/2;ring.userData.depth=depth0;group.add(ring);channelMeshes.push(ring);
+    }
+  }
+
   function buildDiploe(){
-    diploeGroup.clear();diploeMeshes=[];vesselMeshes=[];
-    var h=SIM?SIM.grid.H[1]:0.20;
-    var yCenter=Ht/2-(SIM?SIM.grid.H[0]:0.43)-h/2;
-    var col=layerColors(SIM?SIM.qFinal:SIM?SIM.grid.q0:[])[1]||{r:0.6,g:0.6,b:0.3};
-    var baseColor=new THREE.Color(col.r,col.g,col.b);
-
-    /* Marrow space (dark background volume) */
-    var marrowGeo=new THREE.BoxGeometry(LX*2-0.1,h-0.02,LY*2-0.1);
-    var marrowMat=new THREE.MeshPhongMaterial({color:0x1a0a0a,transparent:true,opacity:0.4});
-    var marrow=new THREE.Mesh(marrowGeo,marrowMat);marrow.position.y=yCenter;diploeGroup.add(marrow);
-
-    /* Trabeculae: interconnected rod network simulating cancellous bone */
-    var trabMat=new THREE.MeshPhongMaterial({color:baseColor,transparent:true,opacity:0.9,shininess:20});
-    var numTrabX=8,numTrabY=6,numTrabZ=8;
-    var trabRadius=0.03;
-
-    /* Vertical trabeculae (along thickness) */
-    for(var i=0;i<numTrabX;i++){for(var k=0;k<numTrabZ;k++){
-      var x=-LX+0.3+(i/(numTrabX-1))*(LX*2-0.6);
-      var z=-LY+0.3+(k/(numTrabZ-1))*(LY*2-0.6);
-      var rod=new THREE.Mesh(new THREE.CylinderGeometry(trabRadius,trabRadius,h,6),trabMat.clone());
-      rod.position.set(x,yCenter,z);diploeGroup.add(rod);diploeMeshes.push(rod);
-    }}
-
-    /* Horizontal trabeculae (X and Z directions, at multiple heights) */
-    for(var j=0;j<3;j++){var y=yCenter-h/2+0.03+(j/2)*(h-0.06);
-      for(i=0;i<numTrabX;i++){var x=-LX+0.3+(i/(numTrabX-1))*(LX*2-0.6);
-        var rodX=new THREE.Mesh(new THREE.CylinderGeometry(trabRadius*0.7,trabRadius*0.7,LY*2-0.6,6),trabMat.clone());
-        rodX.rotation.x=Math.PI/2;rodX.position.set(x,y,0);diploeGroup.add(rodX);diploeMeshes.push(rodX);
-      }
-      for(k=0;k<numTrabZ;k++){var z=-LY+0.3+(k/(numTrabZ-1))*(LY*2-0.6);
-        var rodZ=new THREE.Mesh(new THREE.CylinderGeometry(trabRadius*0.7,trabRadius*0.7,LX*2-0.6,6),trabMat.clone());
-        rodZ.rotation.z=Math.PI/2;rodZ.position.set(0,y,z);diploeGroup.add(rodZ);diploeMeshes.push(rodZ);
+    clearGroup(diploeGroup);diploeMeshes=[];
+    var h0=SIM.grid.H[0],hd=SIM.grid.H[1],levels=3,nx=10,nz=8,nodes=[],i,j,L;
+    var baseR=Math.min(0.048,hd*VS*0.13);
+    for(L=0;L<levels;L++){nodes[L]=[];
+      for(i=0;i<nx;i++){nodes[L][i]=[];
+        for(j=0;j<nz;j++){
+          var x=-RX+(i+0.5)*2*RX/nx+(hash(L*1000+i*31+j*7)-0.5)*0.25;
+          var z=-RZ+(j+0.5)*2*RZ/nz+(hash(L*1000+i*31+j*7+2)-0.5)*0.22;
+          var rho=Math.sqrt(x*x/(RX*RX)+z*z/(RZ*RZ)),theta=normAngle(Math.atan2(z/RZ,x/RX));
+          if(rho>0.93||inCut(theta)){nodes[L][i][j]=null;continue;}
+          var depth=h0+hd*L/(levels-1);
+          nodes[L][i][j]={p:new THREE.Vector3(x,0.48-0.28*rho*rho-depth*VS,z),depth:depth,seed:L*1000+i*31+j*7};
+        }
       }
     }
-
-    /* Diagonal connecting trabeculae for 3D network feel */
-    for(i=0;i<4;i++){for(k=0;k<4;k++){
-      var x1=-LX+0.5+i*1.5,z1=-LY+0.5+k*1.0;
-      var x2=x1+0.8,z2=z1+0.5;
-      var start=new THREE.Vector3(x1,yCenter-h/3,z1),end=new THREE.Vector3(x2,yCenter+h/3,z2);
-      var dir=end.clone().sub(start);var len=dir.length();
-      var rodD=new THREE.Mesh(new THREE.CylinderGeometry(trabRadius*0.5,trabRadius*0.5,len,5),trabMat.clone());
-      rodD.position.copy(start.clone().add(end).multiplyScalar(0.5));
-      rodD.lookAt(end);rodD.rotateX(Math.PI/2);
-      diploeGroup.add(rodD);diploeMeshes.push(rodD);
-    }}
-
-    /* Diploic veins (red-blue vessels running through marrow) */
-    var veinMat=new THREE.MeshPhongMaterial({color:0xcc3333,transparent:true,opacity:0.7});
-    for(i=0;i<3;i++){var x=-LX+0.5+i*2.0;
-      var vein=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,h+0.1,6),veinMat);
-      vein.position.set(x,yCenter,0);diploeGroup.add(vein);vesselMeshes.push(vein);
+    function addBone(nodeA,nodeB,seed){
+      if(!nodeA||!nodeB)return;
+      var mid=nodeA.p.clone().add(nodeB.p).multiplyScalar(0.5),rho=Math.sqrt(mid.x*mid.x/(RX*RX)+mid.z*mid.z/(RZ*RZ));
+      if(rho>0.96||inCut(normAngle(Math.atan2(mid.z/RZ,mid.x/RX))))return;
+      var mat=boneMaterial(0xc59b6d),r=baseR*(0.72+0.55*hash(seed));
+      var rod=rodBetween(nodeA.p,nodeB.p,r,mat);rod.userData.depth=(nodeA.depth+nodeB.depth)/2;diploeGroup.add(rod);diploeMeshes.push(rod);
+    }
+    for(L=0;L<levels;L++)for(i=0;i<nx;i++)for(j=0;j<nz;j++){
+      var n=nodes[L][i][j];if(!n)continue;
+      var smat=boneMaterial(0xc59b6d),sphere=new THREE.Mesh(new THREE.SphereGeometry(baseR*(0.85+0.4*hash(n.seed+9)),7,5),smat);
+      sphere.position.copy(n.p);sphere.userData.depth=n.depth;diploeGroup.add(sphere);diploeMeshes.push(sphere);
+      if(i<nx-1&&hash(n.seed+11)>0.18)addBone(n,nodes[L][i+1][j],n.seed+12);
+      if(j<nz-1&&hash(n.seed+13)>0.20)addBone(n,nodes[L][i][j+1],n.seed+14);
+      if(i<nx-1&&j<nz-1&&hash(n.seed+15)>0.62)addBone(n,nodes[L][i+1][j+1],n.seed+16);
+      if(L<levels-1){addBone(n,nodes[L+1][i][j],n.seed+17);
+        if(i<nx-1&&hash(n.seed+18)>0.48)addBone(n,nodes[L+1][i+1][j],n.seed+19);
+        if(j<nz-1&&hash(n.seed+20)>0.52)addBone(n,nodes[L+1][i][j+1],n.seed+21);}
+    }
+    /* Diploic veins run within the cancellous layer and branch through marrow spaces. */
+    var depth=h0+hd*0.55;
+    for(i=0;i<3;i++){
+      var pts=[];
+      for(j=0;j<7;j++){
+        var x=-1.85+j*0.58,z=-0.58+i*0.46+0.13*Math.sin(j*1.2+i);
+        var rho=Math.sqrt(x*x/(RX*RX)+z*z/(RZ*RZ)),theta=normAngle(Math.atan2(z/RZ,x/RX));
+        if(rho<0.9&&!inCut(theta))pts.push(new THREE.Vector3(x,0.48-0.28*rho*rho-depth*VS,z));
+      }
+      if(pts.length>3){var curve=new THREE.CatmullRomCurve3(pts);var vein=new THREE.Mesh(new THREE.TubeGeometry(curve,36,0.027,7,false),new THREE.MeshPhongMaterial({color:0xa9424d,shininess:18}));diploeGroup.add(vein);
+        var p0=curve.getPoint(0.46),p1=p0.clone().add(new THREE.Vector3(0.22,0.015,0.34));
+        var branchCurve=new THREE.CatmullRomCurve3([p0,p0.clone().add(new THREE.Vector3(0.16,0.02,0.18)),p1]);
+        var branch=new THREE.Mesh(new THREE.TubeGeometry(branchCurve,12,0.016,6,false),new THREE.MeshPhongMaterial({color:0xb9515a}));diploeGroup.add(branch);}
     }
   }
 
-  /* Build inner cortical plate (compact bone, thinner) */
-  function buildInnerPlate(){
-    innerGroup.clear();
-    var h=SIM?SIM.grid.H[2]:0.17;
-    var geo=new THREE.BoxGeometry(LX*2,h,LY*2);
-    var col=layerColors(SIM?SIM.qFinal:SIM?SIM.grid.q0:[])[2]||{r:0.5,g:0.7,b:0.4};
-    var mat=new THREE.MeshPhongMaterial({color:new THREE.Color(col.r,col.g,col.b),transparent:true,opacity:0.85,shininess:30});
-    innerMesh=new THREE.Mesh(geo,mat);
-    innerMesh.position.y=-Ht/2+h/2;
-    innerGroup.add(innerMesh);
-    var edges=new THREE.EdgesGeometry(geo);
-    var line=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0x88cc88,transparent:true,opacity:0.3}));
-    line.position.copy(innerMesh.position);innerGroup.add(line);
+  function makeLabel(text,color,depth,layer){
+    var cv=document.createElement('canvas');cv.width=512;cv.height=128;var ctx=cv.getContext('2d');
+    ctx.fillStyle='rgba(15,23,34,.88)';ctx.fillRect(3,3,506,122);ctx.strokeStyle='#'+color.toString(16).padStart(6,'0');ctx.lineWidth=3;ctx.strokeRect(3,3,506,122);
+    ctx.fillStyle='#edf2f7';ctx.font='600 42px "Microsoft YaHei",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,256,66);
+    var tex=new THREE.CanvasTexture(cv),sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false}));
+    sprite.scale.set(1.55,0.39,1);sprite.position.set(3.18,pointAt(0,0,depth).y,0);sprite.userData={baseY:sprite.position.y,layer:layer};labelGroup.add(sprite);
+    var start=pointAt(0.9,0,depth),end=new THREE.Vector3(2.72,sprite.position.y,0);
+    var line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([start,end]),new THREE.LineBasicMaterial({color:color,transparent:true,opacity:0.65}));line.userData={start:start,end:end,layer:layer};labelGroup.add(line);
   }
 
-  /* Update colors based on simulation state and mode */
-  function updateColors(){
-    if(!SIM)return;
-    var q=SIM.qFinal;
-    if(currentStage===0)q=SIM.grid.q0;
-    else if(currentStage===1&&SIM.final.snaps.length>0)q=SIM.final.snaps[Math.min(1,SIM.final.snaps.length-1)].q;
-    else if(currentStage===2)q=SIM.qFinal;
-    else if(currentStage===3)q=SIM.qFinal;
-    var cols=layerColors(q);
-    if(outerMesh)outerMesh.material.color.setRGB(cols[0].r,cols[0].g,cols[0].b);
-    if(innerMesh)innerMesh.material.color.setRGB(cols[2].r,cols[2].g,cols[2].b);
-    diploeMeshes.forEach(function(m){m.material.color.setRGB(cols[1].r,cols[1].g,cols[1].b);});
+  function buildLabels(){
+    if(labelGroup){clearGroup(labelGroup);modelRoot.remove(labelGroup);}labelGroup=new THREE.Group();modelRoot.add(labelGroup);
+    makeLabel('外板 · 密质骨',0xd8c7a5,SIM.grid.H[0]/2,0);
+    makeLabel('板障 · 骨小梁网',0xc59b6d,SIM.grid.H[0]+SIM.grid.H[1]/2,1);
+    makeLabel('内板 · 密质骨',0xb7a687,SIM.grid.H[0]+SIM.grid.H[1]+SIM.grid.H[2]/2,2);
   }
 
-  /* Rebuild entire model */
+  function buildReagentVisuals(){
+    if(bathMesh){modelRoot.remove(bathMesh);bathMesh.geometry.dispose();bathMesh.material.dispose();}
+    var bg=new THREE.CircleGeometry(1,72);bg.rotateX(-Math.PI/2);bg.scale(RX,1,RZ);
+    bathMesh=new THREE.Mesh(bg,new THREE.MeshPhongMaterial({color:stageColors.urea,transparent:true,opacity:0.13,side:THREE.DoubleSide,depthWrite:false}));
+    bathMesh.position.y=0.66;modelRoot.add(bathMesh);
+    if(particleGroup){clearGroup(particleGroup);modelRoot.remove(particleGroup);}particleGroup=new THREE.Group();modelRoot.add(particleGroup);particles=[];
+    var pg=new THREE.SphereGeometry(0.028,7,5);
+    for(var i=0;i<48;i++){
+      var rho=Math.sqrt(0.06+0.74*hash(700+i*4)),theta=hash(701+i*4)*Math.PI*2;if(inCut(theta))theta+=CUT.width;
+      var p=new THREE.Mesh(pg,new THREE.MeshBasicMaterial({color:stageColors.urea,transparent:true,opacity:0.7,depthWrite:false}));
+      p.userData={rho:rho,theta:theta,phase:hash(702+i*4)};particleGroup.add(p);particles.push(p);
+    }
+  }
+
   function rebuildModel(){
     if(!SIM||!webglAvailable)return;
     Ht=SIM.grid.H[0]+SIM.grid.H[1]+SIM.grid.H[2];
-    buildOuterPlate();buildDiploe();buildInnerPlate();
-    updateColors();
+    clearGroup(outerGroup);clearGroup(innerGroup);channelMeshes=[];
+    outerMesh=buildPlate(0,SIM.grid.H[0],0);outerGroup.add(outerMesh);
+    innerMesh=buildPlate(SIM.grid.H[0]+SIM.grid.H[1],Ht,2);innerGroup.add(innerMesh);
+    buildCompactDetails(outerGroup,0,SIM.grid.H[0],18,100);
+    buildDiploe();
+    buildCompactDetails(innerGroup,SIM.grid.H[0]+SIM.grid.H[1],Ht,12,300);
+    buildLabels();buildReagentVisuals();applyExplode();
   }
 
-  /* Mouse controls */
+  function layerOffset(layer){return exploded?(layer===0?EXP:(layer===2?-EXP:0)):0;}
+  function applyExplode(){
+    if(!webglAvailable)return;
+    outerGroup.position.y=layerOffset(0);innerGroup.position.y=layerOffset(2);diploeGroup.position.y=0;
+    if(bathMesh)bathMesh.position.y=0.66+layerOffset(0);
+    if(labelGroup)labelGroup.children.forEach(function(o){var off=layerOffset(o.userData.layer);
+      if(o.isSprite)o.position.y=o.userData.baseY+off;
+      else if(o.isLine){var a=o.userData.start.clone(),b=o.userData.end.clone();a.y+=off;b.y+=off;o.geometry.setFromPoints([a,b]);}});
+    var b=document.getElementById('explode-btn');b.classList.toggle('active',exploded);b.textContent=exploded?'恢复贴合':'分层展开';
+  }
+
+  function getStageState(stage){
+    var zeros=new Array(SIM.grid.n).fill(0);
+    if(stage===0)return{q:SIM.grid.q0.slice(),c:zeros,Cb:1,t:0,stage:-1};
+    var idx=P.reagent==='seq'?stage-1:0,st=SIM.stages[idx],sn=st.snaps[st.snaps.length-1];
+    return{q:sn.q.slice(),c:sn.c.slice(),Cb:st.Cb,t:st.start+st.duration,stage:idx};
+  }
+
+  function stateAtTime(t){
+    var tl=SIM.timeline;if(t<=0)return getStageState(0);
+    var k=1;while(k<tl.length-1&&tl[k].t<t)k++;
+    var a=tl[k-1],b=tl[k],f=Math.max(0,Math.min(1,(t-a.t)/Math.max(1e-9,b.t-a.t)));
+    var si=0;for(var j=0;j<SIM.stages.length;j++)if(t>=SIM.stages[j].start)si=j;
+    var st=SIM.stages[si],q=new Array(SIM.grid.n),c=new Array(SIM.grid.n);
+    for(var i=0;i<SIM.grid.n;i++){q[i]=a.q[i]+(b.q[i]-a.q[i])*f;c[i]=a.c[i]+(b.c[i]-a.c[i])*f;}
+    return{q:q,c:c,Cb:st.Cb,t:t,stage:si};
+  }
+
+  function sampleAt(depth,state){
+    var g=SIM.grid,i=0;depth=Math.max(0,Math.min(Ht-1e-8,depth));while(i<g.n-1&&depth>g.x[i])i++;
+    return{i:i,layer:g.li[i],q:state.q[i]/g.q0[i],eps:g.eps0[i]+P.alpha*(g.q0[i]-state.q[i]),conc:Math.max(0,Math.min(1,state.c[i]/Math.max(1,state.Cb)))};
+  }
+  function ramp(t,low,mid,high){t=Math.max(0,Math.min(1,t));return t<0.5?new THREE.Color(low).lerp(new THREE.Color(mid),t*2):new THREE.Color(mid).lerp(new THREE.Color(high),(t-0.5)*2);}
+  function colorAt(depth,state){
+    var s=sampleAt(depth,state),stageId=state.stage>=0?SIM.stages[state.stage].id:'edta',rc=stageColors[stageId]||stageColors.edta;
+    if(currentMode==='calcium')return ramp(s.q,0xe0584f,0xf0a53a,0x35c48d);
+    if(currentMode==='porosity')return ramp(s.eps/0.65,0x263c61,0x3aa0ff,0xf0a53a);
+    if(currentMode==='conc')return new THREE.Color(0x17243a).lerp(new THREE.Color(rc),Math.pow(s.conc,0.65));
+    var bases=[0xd8c7a5,0xb78b5b,0xb7a687],col=new THREE.Color(bases[s.layer]);
+    col.lerp(new THREE.Color(0xe0584f),Math.max(0,1-s.q)*0.2);col.lerp(new THREE.Color(rc),s.conc*0.38);return col;
+  }
+  function paintPlate(mesh,state){if(!mesh)return;var attr=mesh.geometry.attributes.color,depths=mesh.userData.depths;for(var i=0;i<depths.length;i++){var col=colorAt(depths[i],state);attr.setXYZ(i,col.r,col.g,col.b);}attr.needsUpdate=true;}
+
+  function updateColors(state){
+    if(!SIM)return;currentState=state||currentState||getStageState(currentStage);
+    if(webglAvailable){
+      paintPlate(outerMesh,currentState);paintPlate(innerMesh,currentState);
+      diploeMeshes.forEach(function(m){m.material.color.copy(colorAt(m.userData.depth,currentState));});
+      channelMeshes.forEach(function(m){m.material.color.copy(colorAt(m.userData.depth,currentState).multiplyScalar(0.58));m.material.opacity=currentMode==='anatomy'?0.38:0.18;});
+      var sid=currentState.stage>=0?SIM.stages[currentState.stage].id:'edta',sc=stageColors[sid]||stageColors.edta;
+      bathMesh.visible=currentStage>0;bathMesh.material.color.setHex(sc);particleGroup.visible=currentStage>0;
+      particles.forEach(function(p,i){var d=((p.userData.phase+currentState.t/240)%1)*Ht;p.position.copy(pointAt(p.userData.rho,p.userData.theta,d-0.025));var s=sampleAt(d,currentState);p.position.y+=layerOffset(s.layer);p.material.color.setHex(sc);p.material.opacity=Math.min(0.82,s.conc*1.3);p.visible=s.conc>0.012;});
+    }
+    updateProtocolUI();
+  }
+
+  function updateProtocolUI(){
+    for(var i=0;i<4;i++)document.getElementById('stage-'+i).classList.toggle('active',i===currentStage);
+    var progress=SIM&&SIM.totalTime?Math.max(0,Math.min(1,(currentState?currentState.t:0)/SIM.totalTime)):0;
+    document.getElementById('stage-progress').value=Math.round(progress*1000);document.getElementById('protocol-fill').style.width=(progress*100).toFixed(1)+'%';
+    var text='原始颅盖 · 外板 / 板障 / 内板';
+    if(currentStage>0&&currentState){var st=SIM.stages[currentState.stage],notes={acid:'酸溶解脱钙；外表面先接触试剂',edta:'螯合脱钙；沿孔隙向板障和内板扩散',urea:'只输运不消耗固相钙'};text=st.name+' · '+(currentState.t/60).toFixed(1)+' min · '+notes[st.id];}
+    if(P.reagent!=='seq')text+='（单试剂模式；点击处理顺序可切换三步法）';
+    document.getElementById('stage-readout').textContent=text;
+    document.getElementById('play-seq').textContent=playing?'暂停播放':'播放顺序浸入';
+  }
+
+  function ensureSequence(){if(P.reagent!=='seq'){P.reagent='seq';var select=document.getElementById('in-reagent');select.value='seq';select.dispatchEvent(new Event('change'));run();}}
+  function setStage(stage){if(stage>0)ensureSequence();playing=false;currentStage=stage;
+    if(stage===0){playTime=0;currentState=getStageState(0);}else{var idx=P.reagent==='seq'?stage-1:0;playTime=SIM.stages[idx].start+SIM.stages[idx].duration;currentState=getStageState(stage);}updateColors();}
+
+  [0,1,2,3].forEach(function(s){document.getElementById('stage-'+s).addEventListener('click',function(){setStage(s);});});
+  document.getElementById('cut-btn').addEventListener('click',function(){cutaway=!cutaway;this.textContent=cutaway?'剖口：开':'剖口：关';rebuildModel();updateColors();});
+  document.getElementById('explode-btn').addEventListener('click',function(){exploded=!exploded;applyExplode();updateColors();});
+  document.getElementById('play-seq').addEventListener('click',function(){ensureSequence();
+    if(playing){playing=false;updateProtocolUI();return;}
+    if(playTime>=SIM.totalTime||currentStage===0)playTime=0;playing=true;playStart=performance.now()-playTime/SIM.totalTime*14000;updateProtocolUI();});
+  document.getElementById('stage-progress').addEventListener('input',function(){var requested=parseInt(this.value,10);ensureSequence();playing=false;playTime=requested/1000*SIM.totalTime;currentState=stateAtTime(playTime);currentStage=currentState.stage+1;updateColors(currentState);});
+
+  function fitCamera(){if(!renderer||!camera)return;var aspect=container.clientWidth/container.clientHeight,scale=Math.max(1,1.15/aspect);camera.aspect=aspect;camera.position.set(5.6*scale,3.0*scale,6.2*scale);camera.lookAt(0,-0.35,0);camera.updateProjectionMatrix();renderer.setSize(container.clientWidth,container.clientHeight);}
+
+  /* Mouse orbit and zoom */
   var isDragging=false,prevMouse={x:0,y:0};
   if(webglAvailable){
     renderer.domElement.addEventListener('mousedown',function(e){isDragging=true;prevMouse={x:e.clientX,y:e.clientY};});
     window.addEventListener('mouseup',function(){isDragging=false;});
-    window.addEventListener('mousemove',function(e){if(!isDragging)return;
-      var dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
-      scene.rotation.y+=dx*0.01;scene.rotation.x+=dy*0.01;
-      scene.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,scene.rotation.x));
-      prevMouse={x:e.clientX,y:e.clientY};});
-    renderer.domElement.addEventListener('wheel',function(e){e.preventDefault();
-      camera.position.multiplyScalar(e.deltaY>0?1.1:0.9);
-      camera.position.clampLength(3,25);},{passive:false});
-
-    /* Animation loop */
-    function animate(){requestAnimationFrame(animate);renderer.render(scene,camera);}
-    animate();
+    window.addEventListener('mousemove',function(e){if(!isDragging)return;var dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;modelRoot.rotation.y+=dx*0.009;modelRoot.rotation.x=Math.max(-0.85,Math.min(0.85,modelRoot.rotation.x+dy*0.007));prevMouse={x:e.clientX,y:e.clientY};});
+    renderer.domElement.addEventListener('wheel',function(e){e.preventDefault();camera.position.multiplyScalar(e.deltaY>0?1.08:0.92);camera.position.clampLength(5,18);},{passive:false});
+    window.addEventListener('resize',fitCamera);
+    function animate(now){requestAnimationFrame(animate);
+      if(playing&&SIM){playTime=(now-playStart)/14000*SIM.totalTime;if(playTime>=SIM.totalTime){playTime=SIM.totalTime;playing=false;}currentState=stateAtTime(playTime);currentStage=currentState.stage+1;updateColors(currentState);}
+      renderer.render(scene,camera);}
+    requestAnimationFrame(animate);
   }
-
-  /* Stage buttons */
-  [0,1,2,3].forEach(function(s){document.getElementById('stage-'+s).addEventListener('click',function(){currentStage=s;updateColors();});});
 
   /* Charts */
   var cp=echarts.init(document.getElementById('ch-profile'),null,{renderer:'svg'});
@@ -583,11 +710,12 @@
       series:[{name:'固相钙剩余',type:'line',data:q.map(function(v,i){return+(v/g.q0[i]).toFixed(4);}),lineStyle:{color:'#35c48d'},symbol:'none'},
               {name:'孔隙率',type:'line',yAxisIndex:1,data:g.q0.map(function(v,i){return+(g.eps0[i]+P.alpha*(v-q[i])).toFixed(4);}),lineStyle:{color:'#f0a53a',type:'dashed'},symbol:'none'}]});
 
-    var snaps=SIM.final.snaps;var caT=snaps.map(function(sn){var t=0,nat=0;for(var i=0;i<g.n;i++){t+=sn.q[i]*g.dx[i];nat+=g.q0[i]*g.dx[i];}return[+(sn.t/60).toFixed(2),+(100*t/nat).toFixed(3)];});
+    var snaps=SIM.timeline;var caT=snaps.map(function(sn){var t=0,nat=0;for(var i=0;i<g.n;i++){t+=sn.q[i]*g.dx[i];nat+=g.q0[i]*g.dx[i];}return[+(sn.t/60).toFixed(2),+(100*t/nat).toFixed(3)];});
+    var stageMarks=SIM.stages.slice(0,-1).map(function(st){return{xAxis:+((st.start+st.duration)/60).toFixed(2)};});
     ct.setOption({animation:false,tooltip:{trigger:'axis',appendToBody:true},grid:{left:52,right:16,top:30,bottom:32},
       xAxis:{type:'value',name:'时间 min',nameLocation:'middle',nameGap:24,axisLabel:{color:'#8fa3bf'},axisLine:{lineStyle:{color:'#2c3d58'}}},
       yAxis:{type:'value',name:'钙剩余 %',axisLabel:{color:'#8fa3bf'},splitLine:{lineStyle:{color:'#2c3d58'}},min:Math.floor(Math.min.apply(null,caT.map(function(x){return x[1];}))-1),max:100},
-      series:[{name:'钙剩余',type:'line',data:caT,lineStyle:{color:'#35c48d'},symbol:'none',areaStyle:{color:'#35c48d',opacity:0.08}}]});
+      series:[{name:'钙剩余',type:'line',data:caT,lineStyle:{color:'#35c48d'},symbol:'none',areaStyle:{color:'#35c48d',opacity:0.08},markLine:{silent:true,symbol:'none',lineStyle:{color:'#8fa3bf',type:'dotted'},label:{color:'#8fa3bf',formatter:'漂洗'},data:stageMarks}}]});
 
     var freqs=[];for(var f=1;f<=200;f+=4)freqs.push(f);
     var Rf=freqs.map(function(f){var roll=f<=100?1:1/Math.sqrt(1+Math.pow(f/100,2)*0.5);return SIM.R1*roll;});
@@ -597,7 +725,7 @@
       series:[{name:'阻抗',type:'line',data:freqs.map(function(f,i){return[f,+Rf[i].toFixed(1)];}),lineStyle:{color:'#3aa0ff'},symbol:'none',
         markLine:{silent:true,symbol:'none',lineStyle:{color:'#8fa3bf',type:'dashed'},label:{color:'#8fa3bf',formatter:'当前'},data:[{xAxis:P.freq}]}}]});}
 
-  function run(){SIM=window.runSim(P);rebuildModel();updateCharts();
+  function run(){SIM=window.runSim(P);playing=false;currentStage=P.reagent==='seq'?3:{acid:1,edta:2,urea:3}[P.reagent];playTime=SIM.totalTime;currentState=getStageState(currentStage);rebuildModel();updateColors(currentState);updateCharts();
     document.getElementById('st-ca').textContent=(100*SIM.caWhole).toFixed(2)+'%';
     document.getElementById('st-ca-o').textContent=(100*SIM.caOuter).toFixed(2)+'%';
     document.getElementById('st-r').textContent=(SIM.R1/SIM.R0).toFixed(3);
@@ -610,7 +738,7 @@
   document.getElementById('reset-btn').addEventListener('click',function(){P=Object.assign({},DEF);
     sl.forEach(function(cfg){var el=document.getElementById('in-'+cfg[0]);el.value=cfg[0]==='kEdta'?-5.3:(cfg[0]==='kAcid'?-7:DEF[cfg[0]]);var raw=parseFloat(el.value);P[cfg[0]]=cfg[3](raw);document.getElementById(cfg[1]).textContent=cfg[2](P[cfg[0]]);});
     document.getElementById('in-reagent').value=DEF.reagent;document.getElementById('in-reagent').dispatchEvent(new Event('change'));run();});
-  document.querySelectorAll('[data-mode]').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('[data-mode]').forEach(function(x){x.style.borderColor='var(--line)';x.style.color='var(--sub)';});b.style.borderColor='var(--acc)';b.style.color='var(--acc)';currentMode=b.getAttribute('data-mode');updateColors();});});
+  document.querySelectorAll('[data-mode]').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('[data-mode]').forEach(function(x){x.classList.remove('active');});b.classList.add('active');currentMode=b.getAttribute('data-mode');CM=currentMode;updateColors();});});
   run();
 })();
 </script>
