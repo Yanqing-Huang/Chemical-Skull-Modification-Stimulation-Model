@@ -327,10 +327,10 @@
       var em=es/ws;var sigma=p.sigmaMatrix+p.sigmaFluid*Math.pow(em,p.archieM);R+=t/sigma;}return R;}
 
   window.runSim=function(p){var g=buildGrid(p);var R0=resistance(g,p,g.q0);var q0=g.q0.slice();
-    if(p.reagent==='seq'){var a=runStage(g,p,{Cb:8740,Db:p.dAcid,kr:p.kAcid,T:300},q0.slice(),12);var finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,T:p.tSoak*60},a.qFinal.slice(),80);}
-    else if(p.reagent==='edta'){finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,T:p.tSoak*60},q0.slice(),80);}
-    else if(p.reagent==='acetic'){finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dAcid,kr:p.kAcid,T:p.tSoak*60},q0.slice(),80);}
-    else{finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dUrea,kr:0,T:p.tSoak*60},q0.slice(),80);}
+    if(p.reagent==='seq'){var a=runStage(g,p,{Cb:8740,Db:p.dAcid,kr:p.kAcid,nu:1,T:300},q0.slice(),12);var finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60},a.qFinal.slice(),80);}
+    else if(p.reagent==='edta'){finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60},q0.slice(),80);}
+    else if(p.reagent==='acetic'){finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dAcid,kr:p.kAcid,nu:1,T:p.tSoak*60},q0.slice(),80);}
+    else{finalStage=runStage(g,p,{Cb:p.cMain*1000,Db:p.dUrea,kr:0,nu:1,T:p.tSoak*60},q0.slice(),80);}
     var qFinal=finalStage.qFinal;var R1=resistance(g,p,qFinal);
     var tot=0,nat=0,oTot=0,oNat=0;for(var i=0;i<g.n;i++){tot+=qFinal[i]*g.dx[i];nat+=g.q0[i]*g.dx[i];if(g.li[i]===0){oTot+=qFinal[i]*g.dx[i];oNat+=g.q0[i]*g.dx[i];}}
     var kr=p.reagent==='acetic'?p.kAcid:(p.reagent==='urea'?0:p.kEdta);var Db=p.reagent==='acetic'?p.dAcid:(p.reagent==='urea'?p.dUrea:p.dEdta);
