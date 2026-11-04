@@ -385,29 +385,41 @@
     });
   });
 
-  /* Three.js 3D anatomical cranial model */
+  /* Three.js 3D anatomical cranial model with WebGL fallback */
   var container=document.getElementById('three-container');
-  var scene=new THREE.Scene();scene.background=new THREE.Color(0x1f2c42);
-  var camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,0.1,100);
-  camera.position.set(6,4,8);camera.lookAt(0,0,0);
-  var renderer=new THREE.WebGLRenderer({antialias:true});
-  renderer.setSize(container.clientWidth,container.clientHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  container.appendChild(renderer.domElement);
-
-  /* Lighting */
-  scene.add(new THREE.AmbientLight(0x404060,0.6));
-  var dirLight=new THREE.DirectionalLight(0xffffff,0.8);dirLight.position.set(5,10,7);scene.add(dirLight);
-  var dirLight2=new THREE.DirectionalLight(0x8899ff,0.3);dirLight2.position.set(-5,-3,-5);scene.add(dirLight2);
-
-  /* Layer groups */
-  var outerGroup=new THREE.Group(),diploeGroup=new THREE.Group(),innerGroup=new THREE.Group();
-  scene.add(outerGroup);scene.add(diploeGroup);scene.add(innerGroup);
-
-  /* State */
-  var currentStage=0,currentMode='calcium';
+  var scene,camera,renderer,outerGroup,diploeGroup,innerGroup;
   var outerMesh,innerMesh,diploeMeshes=[],vesselMeshes=[];
   var LX=3,LY=2,Ht=0.8;
+  var currentStage=0,currentMode='calcium';
+  var webglAvailable=false;
+
+  /* Check WebGL support */
+  try{
+    var testCanvas=document.createElement('canvas');
+    var gl=testCanvas.getContext('webgl')||testCanvas.getContext('experimental-webgl');
+    webglAvailable=!!gl;
+  }catch(e){webglAvailable=false;}
+
+  if(webglAvailable){
+    scene=new THREE.Scene();scene.background=new THREE.Color(0x1f2c42);
+    camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,0.1,100);
+    camera.position.set(6,4,8);camera.lookAt(0,0,0);
+    renderer=new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize(container.clientWidth,container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    /* Lighting */
+    scene.add(new THREE.AmbientLight(0x404060,0.6));
+    var dirLight=new THREE.DirectionalLight(0xffffff,0.8);dirLight.position.set(5,10,7);scene.add(dirLight);
+    var dirLight2=new THREE.DirectionalLight(0x8899ff,0.3);dirLight2.position.set(-5,-3,-5);scene.add(dirLight2);
+
+    /* Layer groups */
+    outerGroup=new THREE.Group();diploeGroup=new THREE.Group();innerGroup=new THREE.Group();
+    scene.add(outerGroup);scene.add(diploeGroup);scene.add(innerGroup);
+  }else{
+    container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:14px;text-align:center;padding:20px">您的浏览器不支持 WebGL，无法显示 3D 模型。<br>请使用 Chrome、Firefox 或 Edge 的最新版本。</div>';
+  }
 
   function valScale(v){v=Math.max(0,Math.min(1,v));return{v:0.15+0.85*v,g:0.6+0.3*v,b:0.5-0.3*v};}
   function layerColors(q){var g=SIM.grid;var vals;
@@ -522,7 +534,7 @@
 
   /* Rebuild entire model */
   function rebuildModel(){
-    if(!SIM)return;
+    if(!SIM||!webglAvailable)return;
     Ht=SIM.grid.H[0]+SIM.grid.H[1]+SIM.grid.H[2];
     buildOuterPlate();buildDiploe();buildInnerPlate();
     updateColors();
@@ -530,20 +542,22 @@
 
   /* Mouse controls */
   var isDragging=false,prevMouse={x:0,y:0};
-  renderer.domElement.addEventListener('mousedown',function(e){isDragging=true;prevMouse={x:e.clientX,y:e.clientY};});
-  window.addEventListener('mouseup',function(){isDragging=false;});
-  window.addEventListener('mousemove',function(e){if(!isDragging)return;
-    var dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
-    scene.rotation.y+=dx*0.01;scene.rotation.x+=dy*0.01;
-    scene.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,scene.rotation.x));
-    prevMouse={x:e.clientX,y:e.clientY};});
-  renderer.domElement.addEventListener('wheel',function(e){e.preventDefault();
-    camera.position.multiplyScalar(e.deltaY>0?1.1:0.9);
-    camera.position.clampLength(3,25);},{passive:false});
+  if(webglAvailable){
+    renderer.domElement.addEventListener('mousedown',function(e){isDragging=true;prevMouse={x:e.clientX,y:e.clientY};});
+    window.addEventListener('mouseup',function(){isDragging=false;});
+    window.addEventListener('mousemove',function(e){if(!isDragging)return;
+      var dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
+      scene.rotation.y+=dx*0.01;scene.rotation.x+=dy*0.01;
+      scene.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,scene.rotation.x));
+      prevMouse={x:e.clientX,y:e.clientY};});
+    renderer.domElement.addEventListener('wheel',function(e){e.preventDefault();
+      camera.position.multiplyScalar(e.deltaY>0?1.1:0.9);
+      camera.position.clampLength(3,25);},{passive:false});
 
-  /* Animation loop */
-  function animate(){requestAnimationFrame(animate);renderer.render(scene,camera);}
-  animate();
+    /* Animation loop */
+    function animate(){requestAnimationFrame(animate);renderer.render(scene,camera);}
+    animate();
+  }
 
   /* Stage buttons */
   [0,1,2,3].forEach(function(s){document.getElementById('stage-'+s).addEventListener('click',function(){currentStage=s;updateColors();});});
