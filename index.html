@@ -401,22 +401,27 @@
   }catch(e){webglAvailable=false;}
 
   if(webglAvailable){
-    scene=new THREE.Scene();scene.background=new THREE.Color(0x1f2c42);
-    camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,0.1,100);
-    camera.position.set(6,4,8);camera.lookAt(0,0,0);
-    renderer=new THREE.WebGLRenderer({antialias:true});
-    renderer.setSize(container.clientWidth,container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
+    try{
+      scene=new THREE.Scene();scene.background=new THREE.Color(0x1f2c42);
+      camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,0.1,100);
+      camera.position.set(6,4,8);camera.lookAt(0,0,0);
+      renderer=new THREE.WebGLRenderer({antialias:true});
+      renderer.setSize(container.clientWidth,container.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
 
-    /* Lighting */
-    scene.add(new THREE.AmbientLight(0x404060,0.6));
-    var dirLight=new THREE.DirectionalLight(0xffffff,0.8);dirLight.position.set(5,10,7);scene.add(dirLight);
-    var dirLight2=new THREE.DirectionalLight(0x8899ff,0.3);dirLight2.position.set(-5,-3,-5);scene.add(dirLight2);
+      /* Lighting */
+      scene.add(new THREE.AmbientLight(0x404060,0.6));
+      var dirLight=new THREE.DirectionalLight(0xffffff,0.8);dirLight.position.set(5,10,7);scene.add(dirLight);
+      var dirLight2=new THREE.DirectionalLight(0x8899ff,0.3);dirLight2.position.set(-5,-3,-5);scene.add(dirLight2);
 
-    /* Layer groups */
-    outerGroup=new THREE.Group();diploeGroup=new THREE.Group();innerGroup=new THREE.Group();
-    scene.add(outerGroup);scene.add(diploeGroup);scene.add(innerGroup);
+      /* Layer groups */
+      outerGroup=new THREE.Group();diploeGroup=new THREE.Group();innerGroup=new THREE.Group();
+      scene.add(outerGroup);scene.add(diploeGroup);scene.add(innerGroup);
+    }catch(e){
+      webglAvailable=false;
+      container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:14px;text-align:center;padding:20px">3D 渲染初始化失败，请使用支持 WebGL 的浏览器。<br>其他功能（参数调节、图表、仿真）仍可正常使用。</div>';
+    }
   }else{
     container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--sub);font-size:14px;text-align:center;padding:20px">您的浏览器不支持 WebGL，无法显示 3D 模型。<br>请使用 Chrome、Firefox 或 Edge 的最新版本。</div>';
   }
