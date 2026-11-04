@@ -1,0 +1,23 @@
+Run the theoretical prior and all numerical checks:
+python run_simulation.py
+
+Run unit tests:
+python -m unittest discover -s tests -v
+
+After receiving in-vitro data, complete examples/experimental_data_template.csv and run:
+python calibrate.py --data examples/experimental_data_template.csv --fit stages.edta.k_r_m3_per_mol_s
+
+A two-parameter apparent-kinetics/porosity calibration example:
+python calibrate.py --data your_experiment.csv --fit stages.acetic_acid.k_r_m3_per_mol_s stages.edta.k_r_m3_per_mol_s transport.porosity_per_released_calcium_m3_per_mol
+
+Supported observables:
+ca_remaining_fraction
+ca_release_mol_per_m2
+porosity
+area_resistance_ohm_m2
+area_resistance_ratio_to_native
+
+Use stage names acetic_acid, edta or urea. Use layer names whole_skull,
+outer_table, diploe or inner_table. Observation times are local to each stage.
+Blank sd entries produce unit-weight residuals. Calibration is not independent
+validation; reserve a separate experimental condition for prospective checking.

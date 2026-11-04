@@ -1,0 +1,131 @@
+{
+  "model_status": "THEORETICAL_PRIOR_NOT_EXPERIMENTALLY_CALIBRATED",
+  "software": {
+    "python": "3.14.8",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+  },
+  "checks": {
+    "all_solvers_succeeded": true,
+    "liquid_mass_balance_relative_error_below_1e-5": true,
+    "stage_calcium_continuity_and_rinse_reset": true,
+    "urea_does_not_consume_calcium": true,
+    "physical_nonnegative_state_within_solver_tolerance": true,
+    "baseline_grid_resistance_difference_from_fine_below_2_percent": true,
+    "outer_scm_analytical_error_below_1e-6": true,
+    "inner_scm_analytical_error_below_1e-6": true
+  },
+  "all_numerical_checks_passed": true,
+  "state_minima": {
+    "concentration_mol_per_m3": 0.0,
+    "calcium_mol_per_m3": 2001.663204198016,
+    "porosity": 0.08
+  },
+  "mass_balance": {
+    "EDTA_0.000_mol_per_l": {
+      "acetic_acid": {
+        "max_absolute_liquid_residual_mol_per_m2": 1.1477881145527391e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 1.1091128016005314e-13,
+        "liquid_residual_relative_to_inflow": 1.1477881145527391e-10
+      },
+      "edta": {
+        "max_absolute_liquid_residual_mol_per_m2": 0.0,
+        "max_absolute_calcium_residual_mol_per_m2": 0.0,
+        "liquid_residual_relative_to_inflow": 0.0
+      },
+      "urea": {
+        "max_absolute_liquid_residual_mol_per_m2": 1.3633100204302195e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 0.0,
+        "liquid_residual_relative_to_inflow": 1.3633100204302195e-10
+      }
+    },
+    "EDTA_0.050_mol_per_l": {
+      "acetic_acid": {
+        "max_absolute_liquid_residual_mol_per_m2": 1.1477881145527391e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 1.1091128016005314e-13,
+        "liquid_residual_relative_to_inflow": 1.1477881145527391e-10
+      },
+      "edta": {
+        "max_absolute_liquid_residual_mol_per_m2": 5.160822805347007e-12,
+        "max_absolute_calcium_residual_mol_per_m2": 3.774758283725532e-15,
+        "liquid_residual_relative_to_inflow": 5.160822805347007e-12
+      },
+      "urea": {
+        "max_absolute_liquid_residual_mol_per_m2": 4.31689795021839e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 0.0,
+        "liquid_residual_relative_to_inflow": 4.31689795021839e-10
+      }
+    },
+    "EDTA_0.100_mol_per_l": {
+      "acetic_acid": {
+        "max_absolute_liquid_residual_mol_per_m2": 1.1477881145527391e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 1.1091128016005314e-13,
+        "liquid_residual_relative_to_inflow": 1.1477881145527391e-10
+      },
+      "edta": {
+        "max_absolute_liquid_residual_mol_per_m2": 9.991456555343003e-12,
+        "max_absolute_calcium_residual_mol_per_m2": 5.023759186428833e-15,
+        "liquid_residual_relative_to_inflow": 9.991456555343003e-12
+      },
+      "urea": {
+        "max_absolute_liquid_residual_mol_per_m2": 2.343436555918288e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 0.0,
+        "liquid_residual_relative_to_inflow": 2.343436555918288e-10
+      }
+    },
+    "EDTA_0.200_mol_per_l": {
+      "acetic_acid": {
+        "max_absolute_liquid_residual_mol_per_m2": 1.1477881145527391e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 1.1091128016005314e-13,
+        "liquid_residual_relative_to_inflow": 1.1477881145527391e-10
+      },
+      "edta": {
+        "max_absolute_liquid_residual_mol_per_m2": 1.745538436015437e-11,
+        "max_absolute_calcium_residual_mol_per_m2": 4.496403249731884e-15,
+        "liquid_residual_relative_to_inflow": 1.745538436015437e-11
+      },
+      "urea": {
+        "max_absolute_liquid_residual_mol_per_m2": 1.6385964807241749e-10,
+        "max_absolute_calcium_residual_mol_per_m2": 0.0,
+        "liquid_residual_relative_to_inflow": 1.6385964807241749e-10
+      }
+    }
+  },
+  "stage_transition_checks": {
+    "EDTA_0.000_mol_per_l": {
+      "acid_to_edta_max_calcium_jump": 0.0,
+      "edta_to_urea_max_calcium_jump": 0.0,
+      "max_stage_initial_liquid_amount": 0.0,
+      "urea_max_calcium_change": 0.0
+    },
+    "EDTA_0.050_mol_per_l": {
+      "acid_to_edta_max_calcium_jump": 0.0,
+      "edta_to_urea_max_calcium_jump": 0.0,
+      "max_stage_initial_liquid_amount": 0.0,
+      "urea_max_calcium_change": 0.0
+    },
+    "EDTA_0.100_mol_per_l": {
+      "acid_to_edta_max_calcium_jump": 0.0,
+      "edta_to_urea_max_calcium_jump": 0.0,
+      "max_stage_initial_liquid_amount": 0.0,
+      "urea_max_calcium_change": 0.0
+    },
+    "EDTA_0.200_mol_per_l": {
+      "acid_to_edta_max_calcium_jump": 0.0,
+      "edta_to_urea_max_calcium_jump": 0.0,
+      "max_stage_initial_liquid_amount": 0.0,
+      "urea_max_calcium_change": 0.0
+    }
+  },
+  "scm_analytical_validation": {
+    "target_front_m": 4.3e-05,
+    "outer_table_analytic_time_s": 9966.996567505721,
+    "outer_table_front_relative_error": 4.330505188939195e-13,
+    "inner_table_constant_interface_analytic_time_s": 39824.69107551488,
+    "inner_table_front_relative_error": 4.3746296959589535e-13,
+    "inner_driver_mol_per_m3": 2185.0,
+    "external_bath_mol_per_m3": 8740.0,
+    "inner_driver_is_interface_not_external_bath": true
+  },
+  "baseline_grid_resistance_relative_difference_from_fine": 0.0009649458020084003
+}

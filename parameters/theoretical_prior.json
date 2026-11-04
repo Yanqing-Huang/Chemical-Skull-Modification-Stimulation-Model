@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "model_status": "THEORETICAL_PRIOR_NOT_CALIBRATION_OR_LITERAL_MEASUREMENT",
+  "species": "Sprague-Dawley rat",
+  "created_date": "2026-11-04",
+  "values": {
+    "geometry": {
+      "total_thickness_mm": 0.8,
+      "layers": [
+        {
+          "name": "outer_table",
+          "thickness_mm": 0.43,
+          "porosity": 0.08,
+          "tortuosity": 4.0,
+          "initial_calcium_mol_per_m3": 11000.0
+        },
+        {
+          "name": "diploe",
+          "thickness_mm": 0.2,
+          "porosity": 0.3,
+          "tortuosity": 2.0,
+          "initial_calcium_mol_per_m3": 6000.0
+        },
+        {
+          "name": "inner_table",
+          "thickness_mm": 0.17,
+          "porosity": 0.1,
+          "tortuosity": 4.0,
+          "initial_calcium_mol_per_m3": 10000.0
+        }
+      ]
+    },
+    "transport": {
+      "porosity_per_released_calcium_m3_per_mol": 3.2e-5,
+      "external_mass_transfer_m_per_s": 1e-5,
+      "scm_reaction_zone_thickness_m": 1e-5
+    },
+    "stages": {
+      "acetic_acid": {
+        "duration_s": 300.0,
+        "bulk_concentration_mol_per_l": 8.74,
+        "bulk_diffusivity_m2_per_s": 1e-9,
+        "k_r_m3_per_mol_s": 1e-7,
+        "reagent_per_calcium_stoichiometry": 2.0
+      },
+      "edta": {
+        "duration_s": 1800.0,
+        "bulk_concentration_mol_per_l": 0.1,
+        "bulk_diffusivity_m2_per_s": 6e-10,
+        "k_r_m3_per_mol_s": 5e-6,
+        "reagent_per_calcium_stoichiometry": 1.0
+      },
+      "urea": {
+        "duration_s": 600.0,
+        "bulk_concentration_mol_per_l": 8.0,
+        "bulk_diffusivity_m2_per_s": 1.4e-9,
+        "k_r_m3_per_mol_s": 0.0,
+        "reagent_per_calcium_stoichiometry": 0.0
+      }
+    },
+    "scenarios": {
+      "edta_concentrations_mol_per_l": [0.0, 0.05, 0.1, 0.2]
+    },
+    "numerics": {
+      "cells_per_layer": [48, 24, 24],
+      "output_times_per_stage": 31,
+      "max_step_s": 5.0,
+      "relative_tolerance": 1e-7,
+      "absolute_tolerance": 1e-9
+    },
+    "electrical": {
+      "measurement_fluid_conductivity_s_per_m": 1.5,
+      "mineral_matrix_conductivity_s_per_m": 1e-4,
+      "archie_exponent": 1.5
+    }
+  },
+  "uncertainty": {
+    "geometry.total_thickness_mm": {
+      "range": [0.65, 0.98],
+      "source": "User-provided SD-rat geometry prior; not measured in the uploaded human-skull papers."
+    },
+    "layers.outer_table.thickness_mm": {
+      "range": [0.30, 0.50],
+      "source": "Inferred layer partition under the 0.8 mm total-thickness constraint; theoretical prior."
+    },
+    "layers.diploe.thickness_mm": {
+      "range": [0.10, 0.30],
+      "source": "Reduced diploe fraction relative to adult human parietal bone is assumed, not measured."
+    },
+    "layers.inner_table.thickness_mm": {
+      "range": [0.12, 0.25],
+      "source": "Outer/inner compact-table asymmetry constrained qualitatively by human anatomy; theoretical prior."
+    },
+    "layers.outer_table.porosity": {
+      "range": [0.03, 0.15],
+      "source": "Assumed compact-bone pore-volume fraction; requires rat micro-CT or histology calibration."
+    },
+    "layers.diploe.porosity": {
+      "range": [0.15, 0.50],
+      "source": "Assumed cancellous-bone pore-volume fraction; requires rat micro-CT or histology calibration."
+    },
+    "layers.inner_table.porosity": {
+      "range": [0.05, 0.18],
+      "source": "Assumed compact-bone pore-volume fraction; requires rat micro-CT or histology calibration."
+    },
+    "layers.outer_table.initial_calcium_mol_per_m3": {
+      "range": [7000.0, 14000.0],
+      "source": "Order-of-magnitude mineral-calcium prior based on bone-mineral composition, not rat measurement."
+    },
+    "layers.diploe.initial_calcium_mol_per_m3": {
+      "range": [3000.0, 9000.0],
+      "source": "Reduced bulk calcium assigned to porous diploe; theoretical prior."
+    },
+    "layers.inner_table.initial_calcium_mol_per_m3": {
+      "range": [7000.0, 13000.0],
+      "source": "Order-of-magnitude mineral-calcium prior based on bone-mineral composition, not rat measurement."
+    },
+    "transport.porosity_per_released_calcium_m3_per_mol": {
+      "range": [1e-5, 6e-5],
+      "source": "Mineral-volume-to-porosity conversion prior; fit using post-rinse porosity or micro-CT."
+    },
+    "transport.external_mass_transfer_m_per_s": {
+      "range": [1e-6, 1e-4],
+      "source": "Apparent bath-to-skull film coefficient; stirring and specimen holder dependent."
+    },
+    "stages.acetic_acid.k_r_m3_per_mol_s": {
+      "range": [1e-9, 1e-5],
+      "source": "Apparent second-order leaching constant; no SD-rat value supplied by the papers or slides."
+    },
+    "stages.edta.k_r_m3_per_mol_s": {
+      "range": [1e-8, 5e-5],
+      "source": "Apparent second-order chelation constant at approximately pH 7.4; pending in-vitro calibration."
+    },
+    "electrical.archie_exponent": {
+      "range": [1.3, 2.0],
+      "source": "Empirical conductivity-porosity exponent for standardized post-rinse resistance estimates."
+    }
+  },
+  "protocol_assumptions": [
+    "Acetic acid is interpreted as 50% v/v, giving a nominal total concentration of 8.74 mol/L; apparent kinetics absorb non-ideal concentrated-solution effects.",
+    "The default sequence is 5 min acetic acid, 30 min EDTA at pH approximately 7.4, then 10 min saturated urea; durations are editable protocol priors.",
+    "Each stage is separated by rinsing: solid calcium and porosity are retained, while all free pore-liquid reagent concentrations are reset to zero.",
+    "Urea is transported but does not consume mineral calcium in the baseline model; no irreversible urea-swelling term is activated.",
+    "The inner surface has zero reagent flux because the isolated-skull modification problem does not include CSF or brain domains.",
+    "The electrical calculation is a standardized post-rinse series-resistance estimate, not a prediction of SSVEP SNR or PLV."
+  ],
+  "references": [
+    {
+      "citation": "Lin Jingxuan, study of cranial-wall thickness in extant humans, uploaded PDF pp. 21, 23-24.",
+      "use": "Three-layer measurement approach and adult human parietal values only; no direct numeric transfer to SD rats."
+    },
+    {
+      "citation": "Liu Ao, human head modelling considering age-related cranial mechanical properties, uploaded PDF pp. 27, 29, 33.",
+      "use": "Head-layer anatomy and site/age dependence; mechanical moduli are not used as transport parameters."
+    },
+    {
+      "citation": "Wu Xiaoming, frequency characteristics and anatomical relationships of human skull electrical impedance, uploaded PDF pp. 1-4.",
+      "use": "Qualitative low-frequency resistive behavior and the influence of diploe; no SD-rat conductivity or 1-100 kHz characteristic frequency is transferred to SSVEP."
+    },
+    {
+      "citation": "Bioreaction Engineering and Equipment, Immobilized Biocatalyst slides, uploaded lower-half PDF pp. 4, 12, 17, 24, 29.",
+      "use": "Effective diffusivity, Thiele modulus, effectiveness factor, Biot number, and internal/external diffusion coupling."
+    }
+  ]
+}
