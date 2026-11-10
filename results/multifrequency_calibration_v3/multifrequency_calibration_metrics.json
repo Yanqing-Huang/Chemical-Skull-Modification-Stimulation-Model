@@ -1,0 +1,434 @@
+{
+  "status": "TRACK_B_V3_FOUR_FREQUENCY_EQUIVALENT_CALIBRATION_PLATFORM_BOUND",
+  "model_version": "v3_four_frequency_magnitude_observation_layer",
+  "analysis_role": "PRIMARY_CONFOUNDER_FILTERED_22_RATS",
+  "platform_disclaimer": "Composite equivalent parameters bundling bone reaction, interface polarization and electrode response; valid only for this measurement platform and not transferable.",
+  "frequencies_hz": [
+    100.0,
+    120.0,
+    1000.0,
+    10000.0
+  ],
+  "observation_operator": "Z_f/Z_f0 = (1-beta_f)*R_matrix/R_matrix0 + beta_f*(phi_surface0/phi_surface(t))**m",
+  "beta_interpolation": "logit(beta_f) is linear in log10(f) from beta_low at 100 Hz to beta_high=beta_low*q at 10000 Hz; 0<q<1",
+  "beta_low_range": [
+    0.3,
+    0.95
+  ],
+  "beta_ratio_open_range": [
+    0.0,
+    1.0
+  ],
+  "interface_exponent_range": [
+    0.5,
+    3.0
+  ],
+  "mechanism_reuse": "The same 200 v2 trajectories and mechanism parameters are reused; no PDE rerun and no frequency-dependent decalcification kinetics.",
+  "lhs": {
+    "seed": 20261114,
+    "per_mechanism_seed_rule": "seed + 1 + mechanism_id",
+    "draws_per_mechanism": 32,
+    "mechanism_count": 200,
+    "candidate_count": 6400,
+    "dimensions": [
+      "beta_low:linear",
+      "beta_ratio:linear",
+      "interface_exponent:log10"
+    ]
+  },
+  "target": "Z_post/Z_baseline magnitude ratio independently at 100/120/1000/10000 Hz; three sites averaged within each rat/condition/frequency, never across frequency",
+  "retained_confounded_rats": [],
+  "all_confounded_records_restored": false,
+  "data_audit": {
+    "source_frequency_rows": 1728,
+    "source_spectrum_count": 432,
+    "source_rat_count": 24,
+    "unfiltered_target_count": 480,
+    "excluded_confounded_target_count": 88,
+    "included_target_count": 392,
+    "included_rat_count": 22,
+    "target_count_by_frequency": {
+      "100": 98,
+      "120": 98,
+      "1000": 98,
+      "10000": 98
+    },
+    "all_targets_have_three_sites_and_three_values": true,
+    "duplicate_target_key_count": 0,
+    "single_rat_conditions": [
+      {
+        "frequency_hz": 100.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.15,
+        "time_s": 5400.0
+      },
+      {
+        "frequency_hz": 100.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.2,
+        "time_s": 5400.0
+      },
+      {
+        "frequency_hz": 120.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.15,
+        "time_s": 5400.0
+      },
+      {
+        "frequency_hz": 120.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.2,
+        "time_s": 5400.0
+      },
+      {
+        "frequency_hz": 1000.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.15,
+        "time_s": 5400.0
+      },
+      {
+        "frequency_hz": 1000.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.2,
+        "time_s": 5400.0
+      },
+      {
+        "frequency_hz": 10000.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.15,
+        "time_s": 5400.0
+      },
+      {
+        "frequency_hz": 10000.0,
+        "stage": "edta",
+        "edta_concentration_mol_per_l": 0.2,
+        "time_s": 5400.0
+      }
+    ]
+  },
+  "tolerance_rule": "Per-frequency RMS of between-rat condition SD; acetic-acid SD pools future EDTA doses only for noise estimation; single-rat conditions do not contribute SD",
+  "tolerances": {
+    "100": 0.09916828151256872,
+    "120": 0.1001108548700834,
+    "1000": 0.2159651930732855,
+    "10000": 0.40918937054476034
+  },
+  "compatibility_rule": "Total normalized RMSE<=1 AND raw RMSE<=the corresponding tolerance at every frequency",
+  "matrix_only_baseline": {
+    "candidate_count": 200,
+    "compatible_count": 0,
+    "best_candidate": {
+      "candidate_id": 123,
+      "mechanism_id": 123,
+      "normalized_rmse": 1.1358327182116543,
+      "raw_rmse_by_frequency": {
+        "100": 0.12000540188728,
+        "120": 0.11990499924080257,
+        "1000": 0.2332760875382582,
+        "10000": 0.42814601830953175
+      },
+      "passes_every_frequency": false
+    },
+    "best_raw_rmse_by_frequency": {
+      "100": {
+        "candidate_id": 123,
+        "raw_rmse": 0.12000540188728
+      },
+      "120": {
+        "candidate_id": 123,
+        "raw_rmse": 0.11990499924080257
+      },
+      "1000": {
+        "candidate_id": 80,
+        "raw_rmse": 0.2111469478888992
+      },
+      "10000": {
+        "candidate_id": 170,
+        "raw_rmse": 0.3662294512335103
+      }
+    },
+    "loo": {
+      "overall": {
+        "fold_count": 22,
+        "available_fold_count": 0,
+        "empty_fold_count": 22,
+        "degenerate_fold_count": 0,
+        "total_point_count": 392,
+        "available_point_count": 0,
+        "point_coverage": null,
+        "median_interval_width": null,
+        "median_relative_width": null,
+        "reading_rule": "Coverage uses only nonempty folds and is reported with prediction availability; empty-fold coverage is NA and single-candidate zero-width intervals are degenerate."
+      },
+      "by_frequency": [
+        {
+          "frequency_hz": 100.0,
+          "fold_count": 22,
+          "available_fold_count": 0,
+          "empty_fold_count": 22,
+          "degenerate_fold_count": 0,
+          "total_point_count": 98,
+          "available_point_count": 0,
+          "point_coverage": null,
+          "median_interval_width": null,
+          "median_relative_width": null
+        },
+        {
+          "frequency_hz": 120.0,
+          "fold_count": 22,
+          "available_fold_count": 0,
+          "empty_fold_count": 22,
+          "degenerate_fold_count": 0,
+          "total_point_count": 98,
+          "available_point_count": 0,
+          "point_coverage": null,
+          "median_interval_width": null,
+          "median_relative_width": null
+        },
+        {
+          "frequency_hz": 1000.0,
+          "fold_count": 22,
+          "available_fold_count": 0,
+          "empty_fold_count": 22,
+          "degenerate_fold_count": 0,
+          "total_point_count": 98,
+          "available_point_count": 0,
+          "point_coverage": null,
+          "median_interval_width": null,
+          "median_relative_width": null
+        },
+        {
+          "frequency_hz": 10000.0,
+          "fold_count": 22,
+          "available_fold_count": 0,
+          "empty_fold_count": 22,
+          "degenerate_fold_count": 0,
+          "total_point_count": 98,
+          "available_point_count": 0,
+          "point_coverage": null,
+          "median_interval_width": null,
+          "median_relative_width": null
+        }
+      ]
+    }
+  },
+  "multifrequency_screening": {
+    "candidate_count": 6400,
+    "compatible_count": 0,
+    "compatible_fraction": 0.0,
+    "best_candidate": {
+      "candidate_id": 5023,
+      "mechanism_id": 156,
+      "normalized_rmse": 1.0588828811134394,
+      "raw_rmse_by_frequency": {
+        "100": 0.1138202527477392,
+        "120": 0.1163260824653458,
+        "1000": 0.20786750551860986,
+        "10000": 0.3862472884020102
+      },
+      "passes_every_frequency": false
+    },
+    "best_raw_rmse_by_frequency": {
+      "100": {
+        "candidate_id": 4221,
+        "raw_rmse": 0.11286242245116068
+      },
+      "120": {
+        "candidate_id": 5023,
+        "raw_rmse": 0.1163260824653458
+      },
+      "1000": {
+        "candidate_id": 5023,
+        "raw_rmse": 0.20786750551860986
+      },
+      "10000": {
+        "candidate_id": 2855,
+        "raw_rmse": 0.36219929462585654
+      }
+    },
+    "pass_count_by_frequency": {
+      "100": 0,
+      "120": 0,
+      "1000": 35,
+      "10000": 1837
+    }
+  },
+  "loo": {
+    "overall": {
+      "fold_count": 22,
+      "available_fold_count": 0,
+      "empty_fold_count": 22,
+      "degenerate_fold_count": 0,
+      "total_point_count": 392,
+      "available_point_count": 0,
+      "point_coverage": null,
+      "median_interval_width": null,
+      "median_relative_width": null,
+      "reading_rule": "Coverage uses only nonempty folds and is reported with prediction availability; empty-fold coverage is NA and single-candidate zero-width intervals are degenerate."
+    },
+    "by_frequency": [
+      {
+        "frequency_hz": 100.0,
+        "fold_count": 22,
+        "available_fold_count": 0,
+        "empty_fold_count": 22,
+        "degenerate_fold_count": 0,
+        "total_point_count": 98,
+        "available_point_count": 0,
+        "point_coverage": null,
+        "median_interval_width": null,
+        "median_relative_width": null
+      },
+      {
+        "frequency_hz": 120.0,
+        "fold_count": 22,
+        "available_fold_count": 0,
+        "empty_fold_count": 22,
+        "degenerate_fold_count": 0,
+        "total_point_count": 98,
+        "available_point_count": 0,
+        "point_coverage": null,
+        "median_interval_width": null,
+        "median_relative_width": null
+      },
+      {
+        "frequency_hz": 1000.0,
+        "fold_count": 22,
+        "available_fold_count": 0,
+        "empty_fold_count": 22,
+        "degenerate_fold_count": 0,
+        "total_point_count": 98,
+        "available_point_count": 0,
+        "point_coverage": null,
+        "median_interval_width": null,
+        "median_relative_width": null
+      },
+      {
+        "frequency_hz": 10000.0,
+        "fold_count": 22,
+        "available_fold_count": 0,
+        "empty_fold_count": 22,
+        "degenerate_fold_count": 0,
+        "total_point_count": 98,
+        "available_point_count": 0,
+        "point_coverage": null,
+        "median_interval_width": null,
+        "median_relative_width": null
+      }
+    ]
+  },
+  "residual_drift_by_frequency": [
+    {
+      "frequency_hz": 100.0,
+      "residual_vs_edta_time_spearman_rho": -0.6485146057835285,
+      "residual_vs_edta_time_spearman_p": 2.3844439625014524e-10,
+      "drift_flag_abs_rho_gt_0.4_and_p_lt_0.05": true
+    },
+    {
+      "frequency_hz": 120.0,
+      "residual_vs_edta_time_spearman_rho": -0.5893313231833134,
+      "residual_vs_edta_time_spearman_p": 2.1353094400920112e-08,
+      "drift_flag_abs_rho_gt_0.4_and_p_lt_0.05": true
+    },
+    {
+      "frequency_hz": 1000.0,
+      "residual_vs_edta_time_spearman_rho": -0.4783555617658112,
+      "residual_vs_edta_time_spearman_p": 1.239540547314888e-05,
+      "drift_flag_abs_rho_gt_0.4_and_p_lt_0.05": true
+    },
+    {
+      "frequency_hz": 10000.0,
+      "residual_vs_edta_time_spearman_rho": -0.3106432915681656,
+      "residual_vs_edta_time_spearman_p": 0.006311095171364803,
+      "drift_flag_abs_rho_gt_0.4_and_p_lt_0.05": false
+    }
+  ],
+  "stage_residuals_by_frequency": [
+    {
+      "frequency_hz": 100.0,
+      "stage": "acetic_acid",
+      "residual_mean": 0.101118288189757,
+      "residual_sd": 0.12834649389876873,
+      "residual_count": 22
+    },
+    {
+      "frequency_hz": 100.0,
+      "stage": "edta",
+      "residual_mean": -0.03250182531685378,
+      "residual_sd": 0.1269045545321228,
+      "residual_count": 76
+    },
+    {
+      "frequency_hz": 120.0,
+      "stage": "acetic_acid",
+      "residual_mean": 0.0840871256877342,
+      "residual_sd": 0.12644705415374083,
+      "residual_count": 22
+    },
+    {
+      "frequency_hz": 120.0,
+      "stage": "edta",
+      "residual_mean": -0.05020876392216487,
+      "residual_sd": 0.12103891614855235,
+      "residual_count": 76
+    },
+    {
+      "frequency_hz": 1000.0,
+      "stage": "acetic_acid",
+      "residual_mean": 0.11059180190410163,
+      "residual_sd": 0.13278122722017185,
+      "residual_count": 22
+    },
+    {
+      "frequency_hz": 1000.0,
+      "stage": "edta",
+      "residual_mean": 0.02954815305171848,
+      "residual_sd": 0.23586865073743268,
+      "residual_count": 76
+    },
+    {
+      "frequency_hz": 10000.0,
+      "stage": "acetic_acid",
+      "residual_mean": 0.17356497164173362,
+      "residual_sd": 0.21521874010956654,
+      "residual_count": 22
+    },
+    {
+      "frequency_hz": 10000.0,
+      "stage": "edta",
+      "residual_mean": 0.10244690313628534,
+      "residual_sd": 0.4089211111616481,
+      "residual_count": 76
+    }
+  ],
+  "exploratory_nearest_approach": {
+    "label": "EXPLORATORY_NEAREST_APPROACH_NOT_A_COMPATIBLE_SET",
+    "candidate_count": 320,
+    "selection_rule": "Lowest 5% total normalized RMSE; diagnostic only",
+    "interpretation": "No candidate satisfies the preregistered joint rule. The nearest-approach envelope and residual diagnostics are not validation evidence.",
+    "best_candidate": {
+      "candidate_id": 5023,
+      "mechanism_id": 156,
+      "normalized_rmse": 1.0588828811134394,
+      "raw_rmse_by_frequency": {
+        "100": 0.1138202527477392,
+        "120": 0.1163260824653458,
+        "1000": 0.20786750551860986,
+        "10000": 0.3862472884020102
+      },
+      "passes_every_frequency": false
+    },
+    "point_coverage_of_targets": 0.6454081632653061
+  },
+  "source_sha256": {
+    "data": "486ec7e995944a814d23f6ecec995c20b716dbfe143519cc9e5fbcb39d18b056",
+    "experimental_parser": "7e13c7c58884b176527844429c4ce73524704371f2c8cd80664a45f47e9fb63b",
+    "module": "2ac9d63c2a61667eb6f93527a25f374c1961fb3da68d116950d8ce65898dbe95",
+    "runner": "97d71d12e30e9a6c49d1f886120ddaaccf91b8f13fb0ff439e3202d163377455",
+    "v2_module": "d956c390b0f2e53f6a2d0435776722582e9793ed1907ab4967bc6cd48fc049f3",
+    "v2_condition_predictions": "692bf9da0886ce2bd760a70918b317768f7201d7baa827e77ce2739b3c7b2617",
+    "v2_lhs_samples": "9ca18d8684bbcffe319f6a961cb41aa9c08e01ed6bed8cdd191c8e34ba7ff9dd",
+    "parameters": "cbb8097cdf0b44e0109ab67d4360ce808039559282d1f2afc66c460149a2f801",
+    "core": "147532fdddabc12c5e0ba793851c41735fd49684618f90af0d78e8aee0d5d6bd"
+  }
+}

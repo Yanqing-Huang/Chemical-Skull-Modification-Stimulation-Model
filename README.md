@@ -17,8 +17,9 @@ pip install -r requirements.txt
 python run_simulation.py          # 生成理论先验结果（CSV + 图）
 python run_prior_mechanism.py     # Track A：200 条文献先验 LHS 轨迹
 python run_equivalent_calibration.py --data /本地路径/体外EDTA数据记录汇总.xlsx
+python run_multifrequency_calibration.py --data /本地路径/体外EDTA数据记录汇总.xlsx  # B v3：四频主分析+全冻存敏感性
 python run_trend_comparison.py    # Track A × 实测低频阻抗趋势对照
-python -m unittest discover -s tests -v   # 31 项单元测试
+python -m unittest discover -s tests -v   # 43 项单元测试
 ```
 
 ## 模型结构
@@ -57,17 +58,21 @@ $$\frac{\partial(\varepsilon c_j)}{\partial t} = \frac{\partial}{\partial x}\lef
 │   ├── ensemble.py                       # LHS 采样与集成预测
 │   ├── experimental.py                   # 实测阻抗谱读取
 │   ├── equivalent_calibration.py         # B v2：双分支观测算子、等效标定、留鼠验证、残差诊断
+│   ├── multifrequency_calibration.py     # B v3：四频观测层、分块评分、逐频容差与留鼠验证
 │   └── plotting.py                       # SCI 风格作图
 ├── run_simulation.py                     # Python 仿真入口
 ├── run_prior_mechanism.py                # A 主线：文献先验 LHS 机理集成（不用实测数据调参）
 ├── run_equivalent_calibration.py         # B v2：基质+界面双分支标定、留鼠验证与界面份额分解
+├── run_multifrequency_calibration.py     # B v3：复用 v2 轨迹的四频主分析与全冻存敏感性分析
 ├── run_trend_comparison.py               # A×实测 Z_ratio 趋势对照（非校准）
 ├── calibrate.py                          # 后续体外数据校准入口
 ├── examples/experimental_data_template.csv
-├── tests/                                # 31 项单元测试
+├── tests/                                # 43 项单元测试
 ├── results/                              # 理论结果、去标识化实测目标与验证输出
 │   ├── prior_mechanism/                  # A 主线集成输出
 │   ├── equivalent_calibration_v2/        # B v2：双分支等效标定输出
+│   ├── multifrequency_calibration_v3/    # B v3：22 只四频主分析输出
+│   ├── multifrequency_calibration_v3_all24_sensitivity/ # B v3：24 只全冻存敏感性输出
 │   └── trend_comparison/                 # 趋势对照输出
 └── index.html                           # 在线交互仿真（轻量近似，定量以 Python 为准）
 ```
@@ -88,17 +93,18 @@ $$\frac{\partial(\varepsilon c_j)}{\partial t} = \frac{\partial}{\partial x}\lef
 ### 数据与质控
 
 - 原始工作簿：24 只大鼠、432 个频谱、1728 行频率测量，频率为 100/120/1000/10000 Hz；源文件 SHA-256 为 `486ec7e995944a814d23f6ecec995c20b716dbfe143519cc9e5fbcb39d18b056`。
-- 当前验证目标是 100/120 Hz 的 `Z_post/Z_baseline`：先逐部位、逐频率相对自身基线，再在大鼠内平均 3 个部位和 2 个频率。
-- 按实验备注剔除冻存、乙醇+尿素处理等混杂测量，排除 22 个大鼠-条件目标；最终为 **22 只大鼠、98 个目标**，每个目标均含 3 个部位、6 个低频比值。
-- 0.15 和 0.20 mol/L 的 90 min 条件各只有 1 只大鼠，相关统计和留鼠结果需谨慎解释。留鼠验证属于**内部验证**，不是独立外部验证。
-- 考虑到 -20°C 冻存后解冻及 PBS 清洗未必造成显著改变，后文另做纳入 WT5/WT6 的 24 只敏感性分析，不覆盖上述主分析口径。
-- 原始 Excel 不纳入仓库；公开内容仅为代码、去标识化大鼠级目标/预测结果和源数据哈希。
+- B v2 的验证目标是 100/120 Hz 的 `Z_post/Z_baseline`：先逐部位、逐频率相对自身基线，再在大鼠内平均 3 个部位和 2 个频率。B v3 改为在 100/120/1000/10000 Hz **分别构建目标**，每个大鼠×条件×频率只平均 3 个部位，禁止跨频平均。
+- 主分析按实验备注剔除冻存、乙醇+尿素处理等混杂测量，排除 22 个大鼠-条件；最终为 **22 只大鼠、每频 98 个目标**。因此 v2 为 98 行、每行 6 个低频比值，v3 为 392 行、每行 3 个同频比值。
+- 0.15 和 0.20 mol/L 的 90 min 条件各只有 1 只大鼠，不贡献条件 SD，但仍纳入评分并单独标记。留鼠验证属于**内部验证**，不是独立外部验证。
+- 考虑到 -20°C 冻存后解冻及 PBS 清洗未必造成显著改变，后文分别保留 v2 的 WT5/WT6 敏感性分析，并新增 v3 的**全部冻存记录恢复**敏感性分析；二者都不覆盖主分析口径。
+- 上传的历史体外分析支持现行乙酸预处理、15/15/30/30 min EDTA 分段测量和 PBS 清洗流程，也显示 1000/10000 Hz 同样下降但幅度较小。其“85%饱和”与“<0.4%/min”定义不一致，均未设为拟合目标。
+- 原始 Excel 和内部分析 docx 不纳入仓库；公开内容仅为代码、去标识化大鼠级目标/预测结果和源数据哈希。
 
 ### Track A：文献先验机理与实测趋势
 
 四个 EDTA 浓度的实测条件均值和仿真中位数均单调下降，各浓度的 Spearman ρ 均为 1.0；但实测总降幅为 0.485–0.617，纯基质模型仅为 0.034–0.089。因此只能认定**趋势方向一致**，不能认定幅值吻合或本征动力学参数得到验证。钙剩余量、脱钙深度以及 PLV/SNR 不在本次实测验证范围内。
 
-### Track B：等效标定与留鼠内部验证（未通过）
+### Track B v2：低频双分支等效标定（未通过）
 
 预设兼容阈值为条件间大鼠 SD 的 RMS，即 0.10328。同一批 98 个目标上的结果为：
 
@@ -112,7 +118,7 @@ $$\frac{\partial(\varepsilon c_j)}{\partial t} = \frac{\partial}{\partial x}\lef
 
 因此当前模型**未通过实测幅值与留鼠内部验证，不能作为已验证预测工具**；兼容集为空，也不报告界面份额。完整数值见 [B v2 指标](results/equivalent_calibration_v2/equivalent_calibration_metrics.json)、[留鼠汇总](results/equivalent_calibration_v2/loo_rat_summary.csv) 和 [残差诊断](results/equivalent_calibration_v2/FigB2_residual_drift.png)。
 
-### 24 只敏感性分析：纳入 WT5/WT6
+### B v2 的 24 只敏感性分析：仅纳入 WT5/WT6
 
 使用 `--retain-confounded-rats WT5 WT6` 仅恢复这两只大鼠，其他日期/条件下有混杂标记的 12 个目标仍剔除，得到 **24 只、108 个目标**。这检验的是“冻存后解冻+PBS清洗可接受”的假设；原记录还含“乙醇+尿素处理”，所以本分析不能单独证明所有预处理均无影响，也不替代主分析。
 
@@ -126,6 +132,56 @@ $$\frac{\partial(\varepsilon c_j)}{\partial t} = \frac{\partial}{\partial x}\lef
 | 残差-EDTA时间 Spearman ρ | -0.635 | -0.600 |
 
 纳入后双分支最佳 RMSE 改善 2.15%，但仍高于阈值，且残差漂移仍显著（p=1.66×10⁻⁹）。留鼠分析中 **22/24 折为空**；WT1、WT14 两折各只有 1 个兼容候选，覆盖率为 0%、区间宽度为 0，属于单点退化区间而非有效验证。因此“模型未通过实测幅值及内部验证”的结论不变。完整结果见 [24 只敏感性指标](results/equivalent_calibration_v2_all24_sensitivity/equivalent_calibration_metrics.json) 和 [留鼠汇总](results/equivalent_calibration_v2_all24_sensitivity/loo_rat_summary.csv)。
+
+### Track B v3：四频幅值观测层（仍未通过）
+
+v3 复用 v2 的同一 200 条机制轨迹，每条增加 32 组三参数 LHS，共 6400 个复合候选；不重跑 PDE，也不让频率改变脱钙动力学。观测算子为：
+
+$$Z_f/Z_{f0}=(1-\beta_f)R_{\rm matrix}+\beta_f\phi_{\rm surface}^{-m},\qquad \beta_{10000}=q\beta_{100}$$
+
+其中 $\beta_{100}\in[0.3,0.95]$、$0<q<1$、$m\in[0.5,3]$，$\operatorname{logit}(\beta_f)$ 沿 $\log_{10}(f)$ 在 100 与 10000 Hz 端点间线性插值，因此等效界面权重随频率不增加。$\beta_f$ 只是平台绑定的等效混合权重，不是真实界面面积或因果份额。
+
+每个频率独立由训练大鼠估计噪声；乙酸只在噪声估计时跨未来 EDTA 剂量合并。主分析四个容差为：
+
+| 频率 | 100 Hz | 120 Hz | 1000 Hz | 10000 Hz |
+|---|---:|---:|---:|---:|
+| 容差 | 0.09917 | 0.10011 | 0.21597 | 0.40919 |
+
+兼容必须同时满足总标准化 RMSE≤1 和每频 raw RMSE≤对应容差，避免 10 kHz 的大容差掩盖低频失配。同一 392 个目标上的结果为：
+
+| 观测结构 | 候选数 | 兼容数 | 最佳总标准化 RMSE | 100 Hz raw | 120 Hz raw | 1000 Hz raw | 10000 Hz raw |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 纯基质 | 200 | 0 | 1.13583 | 0.12000 | 0.11990 | 0.23328 | 0.42815 |
+| 四频双分支 | 6400 | 0 | 1.05888 | 0.11382 | 0.11633 | 0.20787 | 0.38625 |
+
+各 raw 列对应“总标准化 RMSE 最佳”的候选。四频观测层使该指标较纯基质下降 6.77%，但仍未通过；100/120 Hz 的全空间逐频最优 raw RMSE 也分别只有 0.11286/0.11633，仍高于各自容差，故这两个频率均为 **0/6400 通过**。1000/10000 Hz 分别有 35/6400、1837/6400 个候选通过单频门槛，但不能抵消低频失败。
+
+**22/22 个留鼠折均为空兼容集**，392 个留出点的预测均不可用，覆盖率和区间宽度为 NA。最佳 5% 最近邻包络仅作诊断，点覆盖 64.5% 不是验证证据。逐频 EDTA 时间残差诊断如下；100/120/1000 Hz 触发预设 $|\rho|>0.4$ 且 p<0.05 的漂移标记，10 kHz 未触发该标记，但仍不能据此认定模型通过。
+
+| 频率 | Spearman ρ | p 值 | 漂移标记 |
+|---|---:|---:|---|
+| 100 Hz | -0.649 | 2.38×10⁻¹⁰ | 是 |
+| 120 Hz | -0.589 | 2.14×10⁻⁸ | 是 |
+| 1000 Hz | -0.478 | 1.24×10⁻⁵ | 是 |
+| 10000 Hz | -0.311 | 0.00631 | 否 |
+
+v2 的 0.10987 是“100/120 Hz 合并后”的 raw RMSE，v3 的 1.05888 是“四频分别归一化后”的 RMSE，二者数值不能直接比较。可在同一数据口径内比较的是：v2 的双分支相对其纯基质基线，以及 v3 的四频观测层相对其纯基质基线；392→480 行的变化则只来自冻存记录纳入口径，不是模型结构改善。
+
+### B v3 全冻存敏感性分析：24 只、480 行
+
+该分析恢复全部冻存标记记录，而非只恢复 WT5/WT6，得到 24 只、每频 120 个目标。它仅检验“全部冻存记录可接受”的假设；原记录还含乙醇+尿素处理，不能据此证明预处理无影响，也不替代 22 只主分析。
+
+| 指标 | 主分析：22 只 | 全冻存敏感性：24 只 |
+|---|---:|---:|
+| 四频目标数 | 392 | 480 |
+| 四频容差（100/120/1000/10000 Hz） | 0.09917 / 0.10011 / 0.21597 / 0.40919 | 0.09692 / 0.09747 / 0.19986 / 0.36706 |
+| 纯基质最佳总标准化 RMSE | 1.13583 | 1.12135 |
+| 四频双分支最佳总标准化 RMSE | 1.05888 | 1.05466 |
+| 双分支最佳候选四频 raw RMSE | 0.11382 / 0.11633 / 0.20787 / 0.38625 | 0.10760 / 0.10982 / 0.19415 / 0.36772 |
+| 完整数据兼容数 | 0/6400 | 0/6400 |
+| 留鼠空折 | 22/22 | 24/24 |
+
+恢复全部记录后结论不变。完整数值见 [B v3 主分析指标](results/multifrequency_calibration_v3/multifrequency_calibration_metrics.json)、[主分析逐频漂移](results/multifrequency_calibration_v3/residual_drift_by_frequency.csv)、[全冻存敏感性指标](results/multifrequency_calibration_v3_all24_sensitivity/multifrequency_calibration_metrics.json) 和 [敏感性逐频漂移](results/multifrequency_calibration_v3_all24_sensitivity/residual_drift_by_frequency.csv)。当前结果只说明既定轨迹与观测参数空间内的探索性筛选，不支持本征 $R_0$、界面因果份额或已验证预测能力的主张。
 
 ## 其他观测的后续校准
 
@@ -162,12 +218,19 @@ python calibrate.py --data 实验数据.csv --fit stages.edta.k_r_m3_per_mol_s
 - 界面份额是全数据兼容集上的描述性分解，不是后验概率或独立验证的因果份额；预测性能须另看留鼠覆盖率和区间宽度。
 - Track A 不用实测阻抗调参，与实测低频阻抗仅作趋势级对照。
 
+### Track B v3 解读边界
+- 每条机制轨迹使用 32 组 $\beta_{100},q,m$ LHS；纯基质对照仍为同一 200 条轨迹，评分、容差和留鼠规则与四频版本一致。
+- 频率只改变观测层的等效权重，不改变乙酸/EDTA 边界、钙反应或孔隙率轨迹。
+- 总标准化评分之外还设置逐频 raw RMSE 门槛；空留鼠折记 NA，单候选零宽区间记退化，均不能包装成验证成功。
+- 即使后续出现兼容候选，也仅为当前平台的探索性等效描述；不能据此识别本征 $R_0$、固有动力学或真实界面份额。
+
 ## 验证
 
 - 液相质量守恒最大相对误差 < 3×10⁻¹⁰；钙守恒最大绝对残差 < 8×10⁻¹⁴ mol/m²
 - 基准网格相对细网格：EDTA 末钙总量差 0.0046%，面积电阻差 0.0143%
 - 时间步收敛（20 s 相对 5 s）：钙总量与面积电阻相对差均 < 10⁻⁸%
-- 32 项单元测试全过（含无反应极限、SCM 解析验证、浸没边界守恒、分层 k_r、EDTA 位点容量、B v2 双分支及指定大鼠敏感性分析测试）
+- 43 项单元测试全过（含无反应极限、SCM 解析验证、浸没边界守恒、分层 k_r、EDTA 位点容量、B v2 及 B v3 四频观测层测试）
+- B v3 独立复算评分最大差约 3.6×10⁻¹⁵；34 个输出文件完整复跑逐字节一致，记录的输入哈希全部匹配
 - 网页用于轻量交互演示；定量结果以 Python 参考输出为准
 
 ## 参考文献
