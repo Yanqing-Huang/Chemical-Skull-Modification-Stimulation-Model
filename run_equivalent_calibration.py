@@ -85,6 +85,10 @@ def main() -> None:
     parser.add_argument("--max-step", type=float, default=30.0)
     parser.add_argument("--workers", type=int, default=3)
     parser.add_argument(
+        "--retain-confounded-rats", nargs="+", default=[], metavar="RAT",
+        help="Retain these flagged rats for sensitivity analysis; other flags remain excluded.",
+    )
+    parser.add_argument(
         "--reuse-sweep",
         action="store_true",
         help="Skip forward simulations; reuse equivalent_condition_predictions.csv.",
@@ -94,7 +98,9 @@ def main() -> None:
 
     spectra = read_experimental_spectra(args.data)
     unfiltered_targets = build_z_ratio_targets(spectra, drop_confounded=False)
-    targets = build_z_ratio_targets(spectra)
+    targets = build_z_ratio_targets(
+        spectra, retain_confounded_rats=tuple(args.retain_confounded_rats)
+    )
     targets.to_csv(args.output / "z_ratio_targets.csv", index=False)
     tolerance = condition_tolerance(targets)
     condition_keys = ["stage", "edta_concentration_mol_per_l", "time_s"]
@@ -284,7 +290,12 @@ def main() -> None:
         "observation_operator": "Z/Z0 = (1-beta)*R_matrix/R_matrix0 + beta*(porosity_outer_surface0/porosity_outer_surface(t))**m",
         "interface_branch_scope": "Electrode-contact outer surface only; acid contacts the outer table alone, while the immersed EDTA inner-surface reaction is represented in the matrix mechanism.",
         "target": "Z_post/Z_baseline magnitude ratio at 100/120 Hz, sites averaged within rat",
+        "analysis_role": (
+            "SENSITIVITY_ANALYSIS_NOT_PRIMARY"
+            if args.retain_confounded_rats else "PRIMARY_CONFOUNDER_FILTERED"
+        ),
         "confounded_points_dropped": True,
+        "retained_confounded_rats": sorted(args.retain_confounded_rats),
         "data_audit": {
             "source_frequency_rows": int(len(spectra)),
             "source_spectrum_count": int(spectra["spectrum_id"].nunique()),

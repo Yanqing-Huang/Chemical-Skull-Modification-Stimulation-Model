@@ -65,7 +65,9 @@
   "observation_operator": "Z/Z0 = (1-beta)*R_matrix/R_matrix0 + beta*(porosity_outer_surface0/porosity_outer_surface(t))**m",
   "interface_branch_scope": "Electrode-contact outer surface only; acid contacts the outer table alone, while the immersed EDTA inner-surface reaction is represented in the matrix mechanism.",
   "target": "Z_post/Z_baseline magnitude ratio at 100/120 Hz, sites averaged within rat",
+  "analysis_role": "PRIMARY_CONFOUNDER_FILTERED",
   "confounded_points_dropped": true,
+  "retained_confounded_rats": [],
   "data_audit": {
     "source_frequency_rows": 1728,
     "source_spectrum_count": 432,
@@ -177,8 +179,8 @@
   "source_sha256": {
     "data": "486ec7e995944a814d23f6ecec995c20b716dbfe143519cc9e5fbcb39d18b056",
     "experimental_parser": "7e13c7c58884b176527844429c4ce73524704371f2c8cd80664a45f47e9fb63b",
-    "module": "25e025246d8cbe63e0f8f0a2a1aaf7f14ca3d6636b319b61724f465c0ac1dccc",
-    "runner": "3f4ebbeba6c3ae36bfe64b6365dc4eb7cc6643aa810e78a03c7c81abd4753d5b",
+    "module": "d956c390b0f2e53f6a2d0435776722582e9793ed1907ab4967bc6cd48fc049f3",
+    "runner": "e18a775d224ccb0fcd7b7eda9f7eac58875f1cd7b74583f39f0b2291d7264c7f",
     "parameters": "cbb8097cdf0b44e0109ab67d4360ce808039559282d1f2afc66c460149a2f801",
     "core": "147532fdddabc12c5e0ba793851c41735fd49684618f90af0d78e8aee0d5d6bd"
   }

@@ -89,6 +89,22 @@ class TestZRatioTargets(unittest.TestCase):
         edta_times = sorted(targets[targets["stage"] == "edta"]["time_s"].unique())
         self.assertEqual(edta_times, [900.0])
 
+    def test_selected_confounded_rat_is_retained_for_sensitivity(self) -> None:
+        frame = _spectra_frame()
+        frame.loc[
+            (frame["rat"] == "WT1") & (frame["stage"] == "edta"), "confounder"
+        ] = "freeze_thaw"
+        primary = build_z_ratio_targets(frame)
+        sensitivity = build_z_ratio_targets(
+            frame, retain_confounded_rats=("WT1",)
+        )
+        self.assertEqual(set(primary["rat"]), {"WT2"})
+        self.assertEqual(set(sensitivity["rat"]), {"WT1", "WT2"})
+        wt1_times = sorted(
+            sensitivity[(sensitivity["rat"] == "WT1") & (sensitivity["stage"] == "edta")]["time_s"].unique()
+        )
+        self.assertEqual(wt1_times, [900.0, 5400.0])
+
 
 class TestCompatibleSet(unittest.TestCase):
     def test_threshold_selects_exact_candidate(self) -> None:

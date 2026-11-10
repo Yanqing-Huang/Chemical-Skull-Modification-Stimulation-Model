@@ -129,16 +129,20 @@ def build_z_ratio_targets(
     spectra: pd.DataFrame,
     frequencies: tuple[float, ...] = LOW_FREQUENCIES_HZ,
     drop_confounded: bool = True,
+    retain_confounded_rats: tuple[str, ...] = (),
 ) -> pd.DataFrame:
     """Rat-level Z_post/Z_baseline targets from raw magnitude ratios.
 
     Sites (and the two low frequencies) are averaged within each rat before
     any between-rat statistics. The acetic-acid rows inherit each rat's EDTA
     dose from its EDTA block (the workbook stores a placeholder dose there).
+    Selected rats can be retained for an explicit sensitivity analysis while
+    other flagged records remain excluded.
     """
     frame = spectra[spectra["frequency_hz"].isin(frequencies)].copy()
     if drop_confounded:
-        frame = frame[frame["confounder"] == ""]
+        drop = (frame["confounder"] != "") & ~frame["rat"].isin(retain_confounded_rats)
+        frame = frame[~drop]
     dose_map = (
         frame[frame["stage"] == "edta"]
         .groupby("rat")["edta_concentration_mol_per_l"]
