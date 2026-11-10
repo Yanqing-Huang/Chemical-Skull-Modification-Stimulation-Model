@@ -18,6 +18,7 @@ from cranial_model.core import (
     calcium_release_per_area,
     layer_calcium_remaining_fraction,
     layer_mean_porosity,
+    layer_parameter_values,
 )
 from cranial_model.diagnostics import (
     inner_scm_flux_mol_per_m2_s,
@@ -206,7 +207,9 @@ def scm_analytical_validation(scenario) -> dict:
     porosity = layer["porosity"]
     stage = values["stages"]["acetic_acid"]
     d_e = stage["bulk_diffusivity_m2_per_s"] * porosity / layer["tortuosity"]
-    k_s = stage["k_r_m3_per_mol_s"] * q * values["transport"]["scm_reaction_zone_thickness_m"]
+    k_r_cells = layer_parameter_values(grid, stage["k_r_m3_per_mol_s"])
+    k_r_mean = float(np.average(k_r_cells[layer_slice], weights=grid.widths[layer_slice]))
+    k_s = k_r_mean * q * values["transport"]["scm_reaction_zone_thickness_m"]
     k_f = values["transport"]["external_mass_transfer_m_per_s"]
     stoichiometry = stage["reagent_per_calcium_stoichiometry"]
     concentration = stage["bulk_concentration_mol_per_l"] * 1000.0

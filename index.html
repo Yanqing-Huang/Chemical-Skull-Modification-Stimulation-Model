@@ -218,7 +218,7 @@
         ε = ε₀ + α(q₀ − q)<br>
         D<sub>e</sub> = D<sub>bulk</sub> ε / τ
       </div>
-      <p style="font-size:12px;color:var(--sub)">外边界液膜通量（Robin BC），内边界零通量。</p>
+      <p style="font-size:12px;color:var(--sub)">50% 乙酸仅外侧 Robin BC、内侧零通量；EDTA 和尿素完全浸没，内外表面均为 Robin BC。</p>
     </div>
     <div class="card">
       <h3>三步时序改性</h3>
@@ -267,12 +267,12 @@
   <div class="card" style="margin-bottom:16px">
     <h3>当前理论预测（EDTA 浓度扫描，30 min）</h3>
     <table>
-      <thead><tr><th>EDTA 浓度</th><th>全颅骨钙剩余</th><th>阻抗比（处理后/原始）</th></tr></thead>
+      <thead><tr><th>EDTA 浓度</th><th>全颅骨钙剩余</th><th>基质面积电阻比（模型）</th></tr></thead>
       <tbody>
-        <tr><td>0 mol/L</td><td>96.54%</td><td>0.793</td></tr>
-        <tr><td>0.05 mol/L</td><td>95.45%</td><td>0.747</td></tr>
-        <tr><td>0.10 mol/L</td><td>94.37%</td><td>0.707</td></tr>
-        <tr><td>0.20 mol/L</td><td>92.33%</td><td>0.645</td></tr>
+        <tr><td>0.05 mol/L</td><td>94.85%</td><td>0.772</td></tr>
+        <tr><td>0.10 mol/L</td><td>93.97%</td><td>0.741</td></tr>
+        <tr><td>0.15 mol/L</td><td>93.27%</td><td>0.719</td></tr>
+        <tr><td>0.20 mol/L</td><td>92.66%</td><td>0.704</td></tr>
       </tbody>
     </table>
     <div class="note">以上均为待校准理论预测，不是实验结果。</div>
@@ -281,16 +281,16 @@
     <div class="card">
       <h3>数值验证</h3>
       <ul style="margin:8px 0 0 16px;line-height:1.8">
-        <li>质量守恒误差 &lt; 10⁻¹⁰</li>
-        <li>网格收敛：0.096%</li>
-        <li>时间步收敛：0.004%</li>
-        <li>7 项单元测试全过</li>
-        <li>浏览器引擎与 Python 参考偏差 &lt; 1%</li>
+        <li>液相质量守恒最大相对误差 &lt; 3×10⁻¹⁰</li>
+        <li>基准网格面积电阻差：0.0143%</li>
+        <li>时间步相对差：&lt; 10⁻⁸%</li>
+        <li>31 项 Python 单元测试全过</li>
+        <li>网页为轻量交互近似；定量结论以 Python 输出为准</li>
       </ul>
     </div>
     <div class="card">
-      <h3>后续校准</h3>
-      <p>体外实验数据到齐后，运行：</p>
+      <h3>真实数据与后续校准</h3>
+      <p>已开展体外低频阻抗趋势对照与留鼠内部验证，结论见仓库 README；原始 Excel 不公开。其他独立观测可运行：</p>
       <div style="background:var(--panel2);padding:10px;border-radius:6px;margin:8px 0;font-size:12px;font-family:monospace">
         python calibrate.py --data 实验数据.csv
       </div>
@@ -340,6 +340,7 @@
         if(i>0){var Df=2*De[i-1]*De[i]/(De[i-1]+De[i]);var coef=Df/(0.5*(g.dx[i-1]+g.dx[i])*g.dx[i]);lo[i]=-coef;dg[i]+=coef;}
         if(i<n-1){var Df2=2*De[i]*De[i+1]/(De[i]+De[i+1]);var coef2=Df2/(0.5*(g.dx[i]+g.dx[i+1])*g.dx[i]);up[i]=-coef2;dg[i]+=coef2;}}
       var R=1/kf+g.dx[0]/(2*De[0]);var bcoef=1/(R*g.dx[0]);dg[0]+=bcoef;rhs[0]+=bcoef*st.Cb;
+      if(st.immersed){var Rin=1/kf+g.dx[n-1]/(2*De[n-1]);var bcoefIn=1/(Rin*g.dx[n-1]);dg[n-1]+=bcoefIn;rhs[n-1]+=bcoefIn*st.Cb;}
       var cNewArr=thomas(lo,dg,up,rhs);
       for(i=0;i<n;i++){var cNew=Math.max(0,cNewArr[i]);q[i]=Math.max(0,q[i]-st.kr*cNew*q[i]*dt);a[i]=cNew*eps[i];}
       if((s+1)%snapEvery===0||s===steps-1){snaps.push({t:(s+1)*dt,c:a.map(function(v,i2){return v/Math.max(1e-8,g.eps0[i2]+alpha*(g.q0[i2]-q[i2]));}),q:q.slice()});}}
@@ -352,12 +353,12 @@
   window.runSim=function(p){var g=buildGrid(p);var R0=resistance(g,p,g.q0);var q0=g.q0.slice();
     var defs;
     if(p.reagent==='seq')defs=[
-      {id:'acid',name:'50% 乙酸预处理',Cb:8740,Db:p.dAcid,kr:p.kAcid,nu:2,T:300},
-      {id:'edta',name:'EDTA 螯合脱钙',Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60},
-      {id:'urea',name:'尿素溶胀',Cb:8000,Db:p.dUrea,kr:0,nu:0,T:600}];
-    else if(p.reagent==='edta')defs=[{id:'edta',name:'EDTA 螯合脱钙',Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60}];
-    else if(p.reagent==='acetic')defs=[{id:'acid',name:'乙酸酸解脱钙',Cb:p.cMain*1000,Db:p.dAcid,kr:p.kAcid,nu:2,T:p.tSoak*60}];
-    else defs=[{id:'urea',name:'尿素溶胀',Cb:p.cMain*1000,Db:p.dUrea,kr:0,nu:0,T:p.tSoak*60}];
+      {id:'acid',name:'50% 乙酸预处理',Cb:8740,Db:p.dAcid,kr:p.kAcid,nu:2,T:300,immersed:false},
+      {id:'edta',name:'EDTA 螯合脱钙',Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60,immersed:true},
+      {id:'urea',name:'尿素溶胀',Cb:8000,Db:p.dUrea,kr:0,nu:0,T:600,immersed:true}];
+    else if(p.reagent==='edta')defs=[{id:'edta',name:'EDTA 螯合脱钙',Cb:p.cMain*1000,Db:p.dEdta,kr:p.kEdta,nu:1,T:p.tSoak*60,immersed:true}];
+    else if(p.reagent==='acetic')defs=[{id:'acid',name:'乙酸酸解脱钙',Cb:p.cMain*1000,Db:p.dAcid,kr:p.kAcid,nu:2,T:p.tSoak*60,immersed:false}];
+    else defs=[{id:'urea',name:'尿素溶胀',Cb:p.cMain*1000,Db:p.dUrea,kr:0,nu:0,T:p.tSoak*60,immersed:true}];
     var stages=[],timeline=[],offset=0,qStart=q0.slice();
     defs.forEach(function(def,si){var result=runStage(g,p,def,qStart.slice(),si===0?16:40);
       var stage={id:def.id,name:def.name,Cb:def.Cb,start:offset,duration:def.T,snaps:result.snaps,qFinal:result.qFinal};

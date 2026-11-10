@@ -76,8 +76,23 @@ def plot_model_schematic(values: dict, output: Path) -> None:
         axis.text(position + width / 2, y0 + height / 2, name.replace("_", "\n"), ha="center", va="center", color=COLORS[name], fontweight="bold")
         position += width
     axis.text(0.48, 0.035, "Layer thickness: outer 0.43  |  diploe 0.20  |  inner 0.17 mm", ha="center", va="center", fontsize=8)
+    boundary_modes = {
+        name: stage.get(
+            "boundary_mode", values["transport"].get("boundary_mode", "outer_only")
+        )
+        for name, stage in values["stages"].items()
+    }
+    if all(mode == "immersed" for mode in boundary_modes.values()):
+        inner_label = "External bath\nfilm + concentration"
+        inner_equation = r"$J_N=(c_N-C_b)/(1/k_f+\Delta x_N/(2D_{e,N}))$"
+    elif all(mode == "outer_only" for mode in boundary_modes.values()):
+        inner_label = "Inner boundary\nzero flux"
+        inner_equation = r"$J_N=0$"
+    else:
+        inner_label = "Acid: zero flux\nEDTA/urea: external bath"
+        inner_equation = r"$J_N=0$ (acid); bath film flux (EDTA/urea)"
     axis.annotate("External bath\nfilm + concentration", xy=(x0, 0.5), xytext=(-0.20, 0.5), arrowprops={"arrowstyle": "->", "lw": 1.2}, ha="center", va="center")
-    axis.text(1.01, 0.50, "Inner boundary\nzero flux", ha="center", va="center", fontsize=8)
+    axis.text(1.01, 0.50, inner_label, ha="center", va="center", fontsize=8)
     axis.plot([0.86, 0.86], [0.22, 0.78], color="black", lw=2)
     axis.text(0.36, 1.10, "1  Acid (50%)   →   2  EDTA (pH 7.4)   →   3  Urea (sat.)", color="0.20", fontweight="bold", ha="center", fontsize=9)
     axis.text(0.36, 0.94, "Rinse: retain q and porosity; reset free liquid concentration to zero", ha="center", fontsize=8, color="0.25")
@@ -95,7 +110,8 @@ def plot_model_schematic(values: dict, output: Path) -> None:
     equations.text(0.0, 0.84, r"$\frac{\partial(\varepsilon c_j)}{\partial t}=\frac{\partial}{\partial x}\left(D_{e,j}\frac{\partial c_j}{\partial x}\right)-\nu_j k_{r,j}c_jq$", va="top", fontsize=11)
     equations.text(0.0, 0.68, r"$\frac{\partial q}{\partial t}=-k_{r,j}c_jq,\qquad D_{e,j}=D_{b,j}\varepsilon/\tau$", va="top", fontsize=11)
     equations.text(0.0, 0.53, r"$\varepsilon=\varepsilon_0+\alpha(q_0-q)$", va="top", fontsize=11)
-    equations.text(0.0, 0.38, r"$J_0=\frac{C_b-c_0}{1/k_f+\Delta x_0/(2D_{e,0})},\qquad J_N=0$", va="top", fontsize=11)
+    equations.text(0.0, 0.38, r"$J_0=\frac{C_b-c_0}{1/k_f+\Delta x_0/(2D_{e,0})}$", va="top", fontsize=11)
+    equations.text(0.0, 0.29, inner_equation, va="top", fontsize=11)
     equations.text(0.0, 0.20, "Acid and EDTA consume calcium; urea has k$_r$ = 0.\nSCM and Thiele/Biot relations are independent diagnostics.\nElectrical resistance is evaluated after standardized rinsing.", va="top", fontsize=9, linespacing=1.5)
     _save(figure, output)
 

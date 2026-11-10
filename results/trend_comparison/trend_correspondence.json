@@ -1,0 +1,46 @@
+{
+  "status": "TREND_LEVEL_COMPARISON_NOT_CALIBRATION",
+  "disclaimer": "Trend-level comparison only: simulation from literature priors, not calibrated to measured impedance; magnitudes include interface/electrode contributions absent from the bone-matrix model.",
+  "correspondence": [
+    {
+      "edta_concentration_mol_per_l": 0.05,
+      "n_conditions": 5,
+      "measured_monotone_decreasing": true,
+      "sim_median_monotone_decreasing": true,
+      "trend_spearman_rho": 0.9999999999999999,
+      "trend_spearman_p": 1.4042654220543602e-24,
+      "measured_total_drop": 0.5256257110044039,
+      "sim_median_total_drop": 0.034476311295404294
+    },
+    {
+      "edta_concentration_mol_per_l": 0.1,
+      "n_conditions": 5,
+      "measured_monotone_decreasing": true,
+      "sim_median_monotone_decreasing": true,
+      "trend_spearman_rho": 0.9999999999999999,
+      "trend_spearman_p": 1.4042654220543602e-24,
+      "measured_total_drop": 0.4846593865219642,
+      "sim_median_total_drop": 0.05783749044103803
+    },
+    {
+      "edta_concentration_mol_per_l": 0.15,
+      "n_conditions": 5,
+      "measured_monotone_decreasing": true,
+      "sim_median_monotone_decreasing": true,
+      "trend_spearman_rho": 0.9999999999999999,
+      "trend_spearman_p": 1.4042654220543602e-24,
+      "measured_total_drop": 0.49810575917648203,
+      "sim_median_total_drop": 0.07300152138300531
+    },
+    {
+      "edta_concentration_mol_per_l": 0.2,
+      "n_conditions": 5,
+      "measured_monotone_decreasing": true,
+      "sim_median_monotone_decreasing": true,
+      "trend_spearman_rho": 0.9999999999999999,
+      "trend_spearman_p": 1.4042654220543602e-24,
+      "measured_total_drop": 0.6174996863741267,
+      "sim_median_total_drop": 0.08921263806207214
+    }
+  ]
+}

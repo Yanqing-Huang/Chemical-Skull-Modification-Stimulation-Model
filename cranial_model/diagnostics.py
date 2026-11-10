@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .core import LAYER_NAMES, ScenarioResult, effective_diffusivity
+from .core import LAYER_NAMES, ScenarioResult, effective_diffusivity, layer_parameter_values
 
 
 def outer_scm_flux_mol_per_m2_s(
@@ -79,7 +79,7 @@ def thiele_biot_rows(scenario: ScenarioResult) -> list[dict[str, float | str | i
     rows: list[dict[str, float | str | int]] = []
     values = scenario.values
     grid = scenario.grid
-    for stage_name in ("acetic_acid", "edta", "urea"):
+    for stage_name in scenario.stages:
         stage = values["stages"][stage_name]
         initial_calcium = scenario.stages[stage_name].initial_calcium
         diffusivity = effective_diffusivity(grid, values, stage_name, initial_calcium)
@@ -91,7 +91,8 @@ def thiele_biot_rows(scenario: ScenarioResult) -> list[dict[str, float | str | i
             weights = grid.widths[layer_slice]
             q_mean = float(np.average(initial_calcium[layer_slice], weights=weights))
             d_e = float(np.average(diffusivity[layer_slice], weights=weights))
-            k_r = stage["k_r_m3_per_mol_s"]
+            k_r_cells = layer_parameter_values(grid, stage["k_r_m3_per_mol_s"])
+            k_r = float(np.average(k_r_cells[layer_slice], weights=weights))
             stoichiometry = stage["reagent_per_calcium_stoichiometry"]
             phi = thickness * np.sqrt(stoichiometry * k_r * q_mean / d_e) if k_r > 0 else 0.0
             effectiveness = float(np.tanh(phi) / phi) if phi > 0 else 1.0
@@ -120,6 +121,7 @@ def thiele_biot_rows(scenario: ScenarioResult) -> list[dict[str, float | str | i
                     "stage_initial_calcium_mol_per_m3": q_mean,
                     "effective_diffusivity_m2_per_s": d_e,
                     "thiele_modulus": float(phi),
+                    "damkohler_number": float(phi**2),
                     "internal_effectiveness_factor": effectiveness,
                     "biot_number": float(biot),
                     "equivalent_scm_surface_reaction_m_per_s": float(k_s),

@@ -1,0 +1,100 @@
+{
+  "status": "MECHANISM_PRIOR_ENSEMBLE_NOT_CALIBRATED_TO_INHOUSE_IMPEDANCE",
+  "disclaimer": "Mechanism prediction from literature priors; not calibrated to in-house impedance data.",
+  "lhs": {
+    "sample_count": 200,
+    "seed": 20261112,
+    "space": "log10",
+    "sampled_paths": [
+      "stages.acetic_acid.k_r_m3_per_mol_s.outer_table",
+      "stages.acetic_acid.k_r_m3_per_mol_s.diploe",
+      "stages.acetic_acid.k_r_m3_per_mol_s.inner_table",
+      "stages.edta.k_r_m3_per_mol_s.outer_table",
+      "stages.edta.k_r_m3_per_mol_s.diploe",
+      "stages.edta.k_r_m3_per_mol_s.inner_table",
+      "stages.edta.surface_site_capacity_mol_per_m3.outer_table",
+      "stages.edta.surface_site_capacity_mol_per_m3.diploe",
+      "stages.edta.surface_site_capacity_mol_per_m3.inner_table",
+      "transport.external_mass_transfer_m_per_s",
+      "transport.porosity_per_released_calcium_m3_per_mol"
+    ],
+    "prior_ranges": {
+      "stages.acetic_acid.k_r_m3_per_mol_s.outer_table": [
+        1e-09,
+        1e-05
+      ],
+      "stages.acetic_acid.k_r_m3_per_mol_s.diploe": [
+        5e-09,
+        3e-05
+      ],
+      "stages.acetic_acid.k_r_m3_per_mol_s.inner_table": [
+        1e-09,
+        1e-05
+      ],
+      "stages.edta.k_r_m3_per_mol_s.outer_table": [
+        1e-08,
+        5e-05
+      ],
+      "stages.edta.k_r_m3_per_mol_s.diploe": [
+        5e-08,
+        0.0001
+      ],
+      "stages.edta.k_r_m3_per_mol_s.inner_table": [
+        1e-08,
+        5e-05
+      ],
+      "stages.edta.surface_site_capacity_mol_per_m3.outer_table": [
+        400.0,
+        3000.0
+      ],
+      "stages.edta.surface_site_capacity_mol_per_m3.diploe": [
+        200.0,
+        1800.0
+      ],
+      "stages.edta.surface_site_capacity_mol_per_m3.inner_table": [
+        400.0,
+        2600.0
+      ],
+      "transport.external_mass_transfer_m_per_s": [
+        1e-06,
+        0.0001
+      ],
+      "transport.porosity_per_released_calcium_m3_per_mol": [
+        1e-05,
+        6e-05
+      ]
+    }
+  },
+  "numerics": {
+    "cells_per_layer": [
+      24,
+      12,
+      12
+    ],
+    "max_step_s": 10.0,
+    "output_times_per_stage": 31
+  },
+  "doses_mol_per_l": [
+    0.05,
+    0.1,
+    0.15,
+    0.2
+  ],
+  "boundary_modes": {
+    "acetic_acid": "outer_only",
+    "edta": "immersed",
+    "urea": "immersed"
+  },
+  "outer_surface_depth_m": 0.0001,
+  "front_threshold_ca_fraction": 0.99,
+  "front_definition": "Deepest 1%-decalcified position from the stage-specific wetted surface; inner table is measured inward from the inner surface only in immersed stages (EDTA/urea), not during outer-only acetic acid.",
+  "source_sha256": {
+    "run_prior_mechanism.py": "048ee78a9ce987b06f750b02b70b5c8bb7c4a314216d0cd50d3f25f3723f8e11",
+    "cranial_model/core.py": "147532fdddabc12c5e0ba793851c41735fd49684618f90af0d78e8aee0d5d6bd",
+    "cranial_model/ensemble.py": "5a17d5bcf54b380073132cd556df17115f54e353e9f2a514140e538cb67bea95",
+    "cranial_model/diagnostics.py": "4f222790bb01dc3a55b6c98e364c390630a2eb1551ce57553228b2184b828f0d",
+    "parameters/theoretical_prior.json": "cbb8097cdf0b44e0109ab67d4360ce808039559282d1f2afc66c460149a2f801"
+  },
+  "failures": 0,
+  "completed_candidates": 200
+}

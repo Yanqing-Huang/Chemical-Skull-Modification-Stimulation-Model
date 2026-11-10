@@ -1,0 +1,78 @@
+parameter,target,spearman_rho,p_value
+stages.acetic_acid.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.05,-0.7372609315232882,1.4561769042455474e-35
+stages.acetic_acid.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.10,-0.6522808070201755,1.2813838963264006e-25
+stages.acetic_acid.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.15,-0.5932528313207832,2.1145724105862917e-20
+stages.acetic_acid.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.20,-0.5415525388134703,1.229916508835315e-16
+stages.acetic_acid.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.05,0.05275781894547364,0.4581185400150612
+stages.acetic_acid.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.10,0.0333158328958224,0.6395458731383359
+stages.acetic_acid.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.15,0.012807320183004577,0.857156529484463
+stages.acetic_acid.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.20,-0.001360534013350334,0.984745167241225
+stages.acetic_acid.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.05,0.025337133428335712,0.7217414220999844
+stages.acetic_acid.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.10,0.032190804770119257,0.650901240461681
+stages.acetic_acid.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.15,0.03705692642316058,0.6023958854197528
+stages.acetic_acid.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.20,0.04140103502587565,0.560513627542896
+stages.edta.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.05,-0.005883147078676968,0.9341064054130406
+stages.edta.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.10,-0.03906997674941874,0.582813725603766
+stages.edta.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.15,-0.06171904297607441,0.38528697334476747
+stages.edta.k_r_m3_per_mol_s.outer_table,whole_resistance_ratio@edta_end dose=0.20,-0.08163204080102004,0.2505006646440119
+stages.edta.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.05,0.08635265881647043,0.22405013162002285
+stages.edta.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.10,0.09285682142053553,0.1909445587368299
+stages.edta.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.15,0.09453836345908649,0.18299876106958335
+stages.edta.k_r_m3_per_mol_s.diploe,whole_resistance_ratio@edta_end dose=0.20,0.1032535813395335,0.14567892715611389
+stages.edta.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.05,-0.035142878571964305,0.6212830067740608
+stages.edta.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.10,-0.053035325883147084,0.45575401556177975
+stages.edta.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.15,-0.04861321533038327,0.4942342610475147
+stages.edta.k_r_m3_per_mol_s.inner_table,whole_resistance_ratio@edta_end dose=0.20,-0.038607965199129984,0.5872818631904676
+stages.edta.surface_site_capacity_mol_per_m3.outer_table,whole_resistance_ratio@edta_end dose=0.05,-0.08573014325358136,0.22742005315069558
+stages.edta.surface_site_capacity_mol_per_m3.outer_table,whole_resistance_ratio@edta_end dose=0.10,-0.1041011025275632,0.14238347582955097
+stages.edta.surface_site_capacity_mol_per_m3.outer_table,whole_resistance_ratio@edta_end dose=0.15,-0.11933098327458189,0.09236808907108808
+stages.edta.surface_site_capacity_mol_per_m3.outer_table,whole_resistance_ratio@edta_end dose=0.20,-0.12875121878046952,0.06922108458522218
+stages.edta.surface_site_capacity_mol_per_m3.diploe,whole_resistance_ratio@edta_end dose=0.05,0.18808670216755422,0.007650400500373355
+stages.edta.surface_site_capacity_mol_per_m3.diploe,whole_resistance_ratio@edta_end dose=0.10,0.19054226355658896,0.006880159179994501
+stages.edta.surface_site_capacity_mol_per_m3.diploe,whole_resistance_ratio@edta_end dose=0.15,0.19348383709592742,0.006049020149484237
+stages.edta.surface_site_capacity_mol_per_m3.diploe,whole_resistance_ratio@edta_end dose=0.20,0.19677341933548345,0.005226849021806314
+stages.edta.surface_site_capacity_mol_per_m3.inner_table,whole_resistance_ratio@edta_end dose=0.05,0.03580589514737869,0.6147116683758883
+stages.edta.surface_site_capacity_mol_per_m3.inner_table,whole_resistance_ratio@edta_end dose=0.10,0.02097202430060752,0.7681752375848151
+stages.edta.surface_site_capacity_mol_per_m3.inner_table,whole_resistance_ratio@edta_end dose=0.15,0.000595514887872197,0.9933225307087972
+stages.edta.surface_site_capacity_mol_per_m3.inner_table,whole_resistance_ratio@edta_end dose=0.20,-0.01631590789769744,0.8186274009066007
+transport.external_mass_transfer_m_per_s,whole_resistance_ratio@edta_end dose=0.05,0.005830645766144155,0.9346931302301923
+transport.external_mass_transfer_m_per_s,whole_resistance_ratio@edta_end dose=0.10,-0.015993399834995876,0.8221523743994152
+transport.external_mass_transfer_m_per_s,whole_resistance_ratio@edta_end dose=0.15,-0.02991524788119703,0.674114505690855
+transport.external_mass_transfer_m_per_s,whole_resistance_ratio@edta_end dose=0.20,-0.03792094802370059,0.5939549805311677
+transport.porosity_per_released_calcium_m3_per_mol,whole_resistance_ratio@edta_end dose=0.05,-0.5764884122103053,4.159694206756213e-19
+transport.porosity_per_released_calcium_m3_per_mol,whole_resistance_ratio@edta_end dose=0.10,-0.6627210680267007,1.1509351092797502e-26
+transport.porosity_per_released_calcium_m3_per_mol,whole_resistance_ratio@edta_end dose=0.15,-0.7114167854196355,3.6974260984509776e-32
+transport.porosity_per_released_calcium_m3_per_mol,whole_resistance_ratio@edta_end dose=0.20,-0.7475421885547141,4.951732755529047e-37
+stages.acetic_acid.k_r_m3_per_mol_s.outer_table,ca_remaining@edta_end layer=outer_table dose=0.10,-0.9473231830795771,7.430385912948698e-100
+stages.acetic_acid.k_r_m3_per_mol_s.diploe,ca_remaining@edta_end layer=outer_table dose=0.10,0.032667816695417386,0.6460765463165059
+stages.acetic_acid.k_r_m3_per_mol_s.inner_table,ca_remaining@edta_end layer=outer_table dose=0.10,-0.009648241206030151,0.8921417460962607
+stages.edta.k_r_m3_per_mol_s.outer_table,ca_remaining@edta_end layer=outer_table dose=0.10,-0.087011175279382,0.22052405015729876
+stages.edta.k_r_m3_per_mol_s.diploe,ca_remaining@edta_end layer=outer_table dose=0.10,0.08648766219155479,0.223324004516161
+stages.edta.k_r_m3_per_mol_s.inner_table,ca_remaining@edta_end layer=outer_table dose=0.10,0.07013275331883298,0.32372805146142447
+stages.edta.surface_site_capacity_mol_per_m3.outer_table,ca_remaining@edta_end layer=outer_table dose=0.10,-0.14543763594089854,0.039893966429355956
+stages.edta.surface_site_capacity_mol_per_m3.diploe,ca_remaining@edta_end layer=outer_table dose=0.10,0.14153603840096005,0.045592027797400715
+stages.edta.surface_site_capacity_mol_per_m3.inner_table,ca_remaining@edta_end layer=outer_table dose=0.10,0.01759843996099903,0.80464611635657
+transport.external_mass_transfer_m_per_s,ca_remaining@edta_end layer=outer_table dose=0.10,0.06874371859296484,0.33342703683790037
+transport.porosity_per_released_calcium_m3_per_mol,ca_remaining@edta_end layer=outer_table dose=0.10,-0.06381159528988226,0.3693502882325628
+stages.acetic_acid.k_r_m3_per_mol_s.outer_table,ca_remaining@edta_end layer=diploe dose=0.10,0.3658966474161855,9.927541801602205e-08
+stages.acetic_acid.k_r_m3_per_mol_s.diploe,ca_remaining@edta_end layer=diploe dose=0.10,-0.32755118877971956,2.195916744198334e-06
+stages.acetic_acid.k_r_m3_per_mol_s.inner_table,ca_remaining@edta_end layer=diploe dose=0.10,0.21172579314482864,0.0026152100980618817
+stages.edta.k_r_m3_per_mol_s.outer_table,ca_remaining@edta_end layer=diploe dose=0.10,0.11550738768469214,0.10336841795632493
+stages.edta.k_r_m3_per_mol_s.diploe,ca_remaining@edta_end layer=diploe dose=0.10,-0.4077626940673517,2.0599834707156185e-09
+stages.edta.k_r_m3_per_mol_s.inner_table,ca_remaining@edta_end layer=diploe dose=0.10,0.6038055951398785,2.9607503381469746e-21
+stages.edta.surface_site_capacity_mol_per_m3.outer_table,ca_remaining@edta_end layer=diploe dose=0.10,-0.01097127428185705,0.8774604348128586
+stages.edta.surface_site_capacity_mol_per_m3.diploe,ca_remaining@edta_end layer=diploe dose=0.10,-0.09370434260856521,0.18690882331740816
+stages.edta.surface_site_capacity_mol_per_m3.inner_table,ca_remaining@edta_end layer=diploe dose=0.10,0.08081302032550815,0.25530143885409334
+transport.external_mass_transfer_m_per_s,ca_remaining@edta_end layer=diploe dose=0.10,-0.043300082502062555,0.5426550291626502
+transport.porosity_per_released_calcium_m3_per_mol,ca_remaining@edta_end layer=diploe dose=0.10,-0.0776449411235281,0.27446702027968384
+stages.acetic_acid.k_r_m3_per_mol_s.outer_table,ca_remaining@edta_end layer=inner_table dose=0.10,0.06874221855546389,0.33343761047225784
+stages.acetic_acid.k_r_m3_per_mol_s.diploe,ca_remaining@edta_end layer=inner_table dose=0.10,-0.014443861096527417,0.8391371607349376
+stages.acetic_acid.k_r_m3_per_mol_s.inner_table,ca_remaining@edta_end layer=inner_table dose=0.10,-0.15405235130878275,0.02940665909627021
+stages.edta.k_r_m3_per_mol_s.outer_table,ca_remaining@edta_end layer=inner_table dose=0.10,0.08758118952973826,0.21750390265231206
+stages.edta.k_r_m3_per_mol_s.diploe,ca_remaining@edta_end layer=inner_table dose=0.10,0.1260076501912548,0.07541355490588757
+stages.edta.k_r_m3_per_mol_s.inner_table,ca_remaining@edta_end layer=inner_table dose=0.10,-0.8790144753618842,1.3125527174132701e-65
+stages.edta.surface_site_capacity_mol_per_m3.outer_table,ca_remaining@edta_end layer=inner_table dose=0.10,0.07092027300682517,0.31831103481629824
+stages.edta.surface_site_capacity_mol_per_m3.diploe,ca_remaining@edta_end layer=inner_table dose=0.10,0.07112727818195456,0.31689697045442955
+stages.edta.surface_site_capacity_mol_per_m3.inner_table,ca_remaining@edta_end layer=inner_table dose=0.10,-0.32304957623940606,3.0759207723161203e-06
+transport.external_mass_transfer_m_per_s,ca_remaining@edta_end layer=inner_table dose=0.10,-0.08870471761794045,0.21163770875538332
+transport.porosity_per_released_calcium_m3_per_mol,ca_remaining@edta_end layer=inner_table dose=0.10,0.010735768394209855,0.8800708642921442

@@ -33,25 +33,42 @@
     "transport": {
       "porosity_per_released_calcium_m3_per_mol": 3.2e-5,
       "external_mass_transfer_m_per_s": 1e-5,
-      "scm_reaction_zone_thickness_m": 1e-5
+      "scm_reaction_zone_thickness_m": 1e-5,
+      "scm_grain_radius_m": 1e-5,
+      "compact_layer_model": "shrinking_core_grain",
+      "scm_include_product_layer_resistance": true,
+      "maximum_porosity": 0.95
     },
     "stages": {
       "acetic_acid": {
+        "boundary_mode": "outer_only",
         "duration_s": 300.0,
+        "bath_volume_ml": 1.0,
         "bulk_concentration_mol_per_l": 8.74,
         "bulk_diffusivity_m2_per_s": 1e-9,
-        "k_r_m3_per_mol_s": 1e-7,
+        "k_r_m3_per_mol_s": {"outer_table": 1e-7, "diploe": 1e-7, "inner_table": 1e-7},
         "reagent_per_calcium_stoichiometry": 2.0
       },
       "edta": {
-        "duration_s": 1800.0,
+        "boundary_mode": "immersed",
+        "duration_s": 5400.0,
         "bulk_concentration_mol_per_l": 0.1,
         "bulk_diffusivity_m2_per_s": 6e-10,
-        "k_r_m3_per_mol_s": 5e-6,
-        "reagent_per_calcium_stoichiometry": 1.0
+        "k_r_m3_per_mol_s": {"outer_table": 5e-6, "diploe": 5e-6, "inner_table": 5e-6},
+        "surface_site_capacity_mol_per_m3": {"outer_table": 1100.0, "diploe": 600.0, "inner_table": 1000.0},
+        "reagent_per_calcium_stoichiometry": 1.0,
+        "segments": [
+          {"duration_s": 900.0, "bath_volume_ml": 25.0},
+          {"duration_s": 900.0, "bath_volume_ml": 25.0},
+          {"duration_s": 1800.0, "bath_volume_ml": 50.0},
+          {"duration_s": 1800.0, "bath_volume_ml": 50.0}
+        ]
       },
       "urea": {
+        "boundary_mode": "immersed",
         "duration_s": 600.0,
+        "bath_volume_ml": 20.0,
+        "solvent": "75% ethanol",
         "bulk_concentration_mol_per_l": 8.0,
         "bulk_diffusivity_m2_per_s": 1.4e-9,
         "k_r_m3_per_mol_s": 0.0,
@@ -59,7 +76,7 @@
       }
     },
     "scenarios": {
-      "edta_concentrations_mol_per_l": [0.0, 0.05, 0.1, 0.2]
+      "edta_concentrations_mol_per_l": [0.05, 0.1, 0.15, 0.2]
     },
     "numerics": {
       "cells_per_layer": [48, 24, 24],
@@ -73,6 +90,17 @@
       "mineral_matrix_conductivity_s_per_m": 1e-4,
       "archie_exponent": 1.5
     }
+  },
+  "experimental_protocol": {
+    "instrument": "众仪 ZT-DQ01",
+    "frequencies_hz": [100, 120, 1000, 10000],
+    "frequency_10000_unit": "kΩ",
+    "measurement_condition": "PBS rinse before every impedance measurement",
+    "acetic_acid": "50%, 1 mL, 5 min",
+    "edta": "pH 7.4; fresh 25/25/50/50 mL for successive 15/15/30/30 min segments",
+    "edta_measurement_times_min": [15, 30, 60, 90],
+    "urea": "Saturated urea prepared with 75% ethanol, 20 mL, 10 min",
+    "urea_transport_caution": "Water-based diffusivity and nominal concentration remain unconfirmed placeholders for the 75% ethanol solvent; urea is excluded from current acid/EDTA calibration"
   },
   "uncertainty": {
     "geometry.total_thickness_mm": {
@@ -125,11 +153,47 @@
     },
     "stages.acetic_acid.k_r_m3_per_mol_s": {
       "range": [1e-9, 1e-5],
-      "source": "Apparent second-order leaching constant; no SD-rat value supplied by the papers or slides."
+      "source": "Aggregate legacy range kept for the frozen ensemble protocol; superseded by per-layer entries below. Apparent second-order leaching constant."
+    },
+    "stages.acetic_acid.k_r_m3_per_mol_s.outer_table": {
+      "range": [1e-9, 1e-5],
+      "source": "Apparent H+ leaching constant for compact outer table; ore-acidification analogy (Liu 2018; Jiao 2014); theoretical prior, not rat-calibrated."
+    },
+    "stages.acetic_acid.k_r_m3_per_mol_s.diploe": {
+      "range": [5e-9, 3e-5],
+      "source": "Pore-wall leaching constant for pre-exposed diploe surfaces; expected faster than compact tables; theoretical prior."
+    },
+    "stages.acetic_acid.k_r_m3_per_mol_s.inner_table": {
+      "range": [1e-9, 1e-5],
+      "source": "Apparent H+ leaching constant for compact inner table; theoretical prior."
     },
     "stages.edta.k_r_m3_per_mol_s": {
       "range": [1e-8, 5e-5],
-      "source": "Apparent second-order chelation constant at approximately pH 7.4; pending in-vitro calibration."
+      "source": "Aggregate legacy range kept for the frozen ensemble protocol; superseded by per-layer entries below. Apparent chelation constant at pH 7.4."
+    },
+    "stages.edta.k_r_m3_per_mol_s.outer_table": {
+      "range": [1e-8, 5e-5],
+      "source": "Apparent EDTA chelation constant on SCM-exposed outer-table surfaces; theoretical prior."
+    },
+    "stages.edta.k_r_m3_per_mol_s.diploe": {
+      "range": [5e-8, 1e-4],
+      "source": "Apparent EDTA chelation constant on pre-exposed diploe pore walls; theoretical prior."
+    },
+    "stages.edta.k_r_m3_per_mol_s.inner_table": {
+      "range": [1e-8, 5e-5],
+      "source": "Apparent EDTA chelation constant on SCM-exposed inner-table surfaces; theoretical prior."
+    },
+    "stages.edta.surface_site_capacity_mol_per_m3.outer_table": {
+      "range": [400.0, 3000.0],
+      "source": "Finite exchangeable surface-calcium pool (Tiselius HA chromatography site mechanism), assumed ~4-27% of bulk calcium; requires isotherm measurement."
+    },
+    "stages.edta.surface_site_capacity_mol_per_m3.diploe": {
+      "range": [200.0, 1800.0],
+      "source": "Finite pre-exposed surface-site pool in porous diploe (Tiselius mechanism), ~3-30% of layer calcium; theoretical prior."
+    },
+    "stages.edta.surface_site_capacity_mol_per_m3.inner_table": {
+      "range": [400.0, 2600.0],
+      "source": "Finite exchangeable surface-calcium pool for inner table (Tiselius mechanism); theoretical prior."
     },
     "electrical.archie_exponent": {
       "range": [1.3, 2.0],
@@ -138,11 +202,13 @@
   },
   "protocol_assumptions": [
     "Acetic acid is interpreted as 50% v/v, giving a nominal total concentration of 8.74 mol/L; apparent kinetics absorb non-ideal concentrated-solution effects.",
-    "The default sequence is 5 min acetic acid, 30 min EDTA at pH approximately 7.4, then 10 min saturated urea; durations are editable protocol priors.",
-    "Each stage is separated by rinsing: solid calcium and porosity are retained, while all free pore-liquid reagent concentrations are reset to zero.",
-    "Urea is transported but does not consume mineral calcium in the baseline model; no irreversible urea-swelling term is activated.",
-    "The inner surface has zero reagent flux because the isolated-skull modification problem does not include CSF or brain domains.",
-    "The electrical calculation is a standardized post-rinse series-resistance estimate, not a prediction of SSVEP SNR or PLV."
+    "The experimental sequence is 50% acetic acid (1 mL, 5 min), pH 7.4 EDTA in four fresh-bath segments (25/25/50/50 mL for 15/15/30/30 min), then saturated urea in 75% ethanol (20 mL, 10 min).",
+    "PBS rinsing before every impedance measurement is approximated as complete pore-liquid reset at stage and EDTA-segment boundaries; solid calcium and porosity are retained.",
+    "Urea is transported but does not consume mineral calcium in the baseline model; no irreversible urea-swelling or ethanol-tissue effect is activated.",
+    "The in-vitro boundary is stage-specific: 50% acetic acid contacts only the outer table (stages.acetic_acid.boundary_mode=outer_only, zero inner flux); EDTA and urea use complete centrifuge-tube immersion (boundary_mode=immersed), so both outer and inner table surfaces contact the same bath. For prospective in-vivo outer-table application, set the relevant stage to outer_only.",
+    "The electrical calculation is a standardized post-rinse series-resistance estimate, not a prediction of SSVEP SNR or PLV.",
+    "Acetic-acid dissolution follows the ore-acidification leaching analogy (H+ diffusion through the reacted layer competing with surface reaction; JMA-type fast-then-slow deceleration emerges from SCM product-layer resistance rather than from an empirical time exponent; uranium-ore rate constants on a days timescale are NOT transferred).",
+    "Neutral EDTA chelation is limited by a finite exchangeable surface-calcium site pool per layer (Tiselius HA chromatography mechanism); the rate decays linearly with pool depletion and stops at the capacity, while compact-table exposure remains gated by the SCM reaction front."
   ],
   "references": [
     {
@@ -160,6 +226,18 @@
     {
       "citation": "Bioreaction Engineering and Equipment, Immobilized Biocatalyst slides, uploaded lower-half PDF pp. 4, 12, 17, 24, 29.",
       "use": "Effective diffusivity, Thiele modulus, effectiveness factor, Biot number, and internal/external diffusion coupling."
+    },
+    {
+      "citation": "刘玉龙, 铀矿石酸化-细菌柱浸的动力学分析, 2018 (uploaded PDF).",
+      "use": "Mechanism analogy for the 50% acetic-acid stage: H+ leaching kinetics, JMA vs shrinking-core discrimination, n<0.5 diffusion-control criterion. Uranium rate constants and day-scale times are not transferred."
+    },
+    {
+      "citation": "焦学然, 酸度及酸化介质对铀矿石微生物浸出酸化的影响, 2014 (uploaded PDF).",
+      "use": "Qualitative prior: higher initial acidity shortens acidification and raises early-stage consumption; supports acetic concentration/duration as dominant sensitive factors."
+    },
+    {
+      "citation": "Tiselius et al., hydroxyapatite chromatography calcium-binding site mechanism (classical literature, not uploaded).",
+      "use": "Finite-capacity exchangeable surface-calcium sites motivating the EDTA surface_site_capacity decay term."
     }
   ]
 }
