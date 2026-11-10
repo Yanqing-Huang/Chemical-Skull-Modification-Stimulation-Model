@@ -19,7 +19,17 @@ python run_prior_mechanism.py     # Track A：200 条文献先验 LHS 轨迹
 python run_equivalent_calibration.py --data /本地路径/体外EDTA数据记录汇总.xlsx
 python run_multifrequency_calibration.py --data /本地路径/体外EDTA数据记录汇总.xlsx  # B v3：四频主分析+全冻存敏感性
 python run_trend_comparison.py    # Track A × 实测低频阻抗趋势对照
-python -m unittest discover -s tests -v   # 43 项单元测试
+# 当前 B1：R_Z 嵌套校准区间；公开机制输入不含原始实验数据
+python run_interval_prediction.py --target ratio --mechanism-id 157 --workers 2 \
+  --predictions results/track_b_interval_rz/mechanism157_condition_predictions.csv \
+  --data /本地路径/体外EDTA数据记录汇总.xlsx \
+  --output results/track_b_interval_rz/calibrated_interval
+# 当前 B2：ΔZ 嵌套校准区间（MΩ）
+python run_interval_prediction.py --target delta --mechanism-id 19 --workers 2 \
+  --predictions results/track_b_interval_delta_z/mechanism19_condition_predictions.csv \
+  --data /本地路径/体外EDTA数据记录汇总.xlsx \
+  --output results/track_b_interval_delta_z/calibrated_interval
+python -m unittest discover -s tests -v   # 77 项单元测试
 ```
 
 ## 模型结构
@@ -31,7 +41,7 @@ python -m unittest discover -s tests -v   # 43 项单元测试
 
 ### 三步时序化学改性
 1. **50% 乙酸预处理**（300 s）——酸溶解初步脱钙
-2. **EDTA 螯合**（30 min，0.1 mol/L）——主脱钙阶段
+2. **EDTA 螯合**（90 min，浓度扫描；15/15/30/30 min 分段换新液）——主脱钙阶段
 3. **饱和尿素**（10 min）——溶胀，不消耗固相钙
 
 ### 控制方程（多孔介质）
@@ -59,20 +69,31 @@ $$\frac{\partial(\varepsilon c_j)}{\partial t} = \frac{\partial}{\partial x}\lef
 │   ├── experimental.py                   # 实测阻抗谱读取
 │   ├── equivalent_calibration.py         # B v2：双分支观测算子、等效标定、留鼠验证、残差诊断
 │   ├── multifrequency_calibration.py     # B v3：四频观测层、分块评分、逐频容差与留鼠验证
+│   ├── near_surface.py / site_geometry.py # 近表面状态、三位点几何与曲面守恒
+│   ├── diploe_polarization.py            # 保历史的板障串联极化状态
+│   ├── frequency_surface_polarization.py # 13/17/19 参数频率—表面—极化观测模型
+│   ├── delta_z_calibration.py            # 同鼠同位点同频 ΔZ 目标、容差与评分
+│   ├── interval_prediction.py            # 集成区间与分组交叉一致性校准
 │   └── plotting.py                       # SCI 风格作图
 ├── run_simulation.py                     # Python 仿真入口
 ├── run_prior_mechanism.py                # A 主线：文献先验 LHS 机理集成（不用实测数据调参）
 ├── run_equivalent_calibration.py         # B v2：基质+界面双分支标定、留鼠验证与界面份额分解
 ├── run_multifrequency_calibration.py     # B v3：复用 v2 轨迹的四频主分析与全冻存敏感性分析
 ├── run_trend_comparison.py               # A×实测 Z_ratio 趋势对照（非校准）
+├── run_frequency_surface_polarization.py # 原 R_Z 点值全数据可达性诊断
+├── run_frequency_surface_loo.py          # 原 R_Z 19 参数逐折独立留鼠验证
+├── run_delta_z_calibration.py / run_delta_z_loo.py # ΔZ 可达性与基础留鼠诊断
+├── run_interval_prediction.py            # B1/B2 共用的嵌套校准区间入口
 ├── calibrate.py                          # 后续体外数据校准入口
 ├── examples/experimental_data_template.csv
-├── tests/                                # 43 项单元测试
+├── tests/                                # 77 项单元测试
 ├── results/                              # 理论结果、去标识化实测目标与验证输出
 │   ├── prior_mechanism/                  # A 主线集成输出
 │   ├── equivalent_calibration_v2/        # B v2：双分支等效标定输出
 │   ├── multifrequency_calibration_v3/    # B v3：22 只四频主分析输出
 │   ├── multifrequency_calibration_v3_all24_sensitivity/ # B v3：24 只全冻存敏感性输出
+│   ├── track_b_interval_rz/              # 原 R_Z 点值对照与 B1 校准区间
+│   ├── track_b_interval_delta_z/         # B2 ΔZ 诊断、基础留鼠与校准区间
 │   └── trend_comparison/                 # 趋势对照输出
 └── index.html                           # 在线交互仿真（轻量近似，定量以 Python 为准）
 ```
@@ -99,6 +120,29 @@ $$\frac{\partial(\varepsilon c_j)}{\partial t} = \frac{\partial}{\partial x}\lef
 - 考虑到 -20°C 冻存后解冻及 PBS 清洗未必造成显著改变，后文分别保留 v2 的 WT5/WT6 敏感性分析，并新增 v3 的**全部冻存记录恢复**敏感性分析；二者都不覆盖主分析口径。
 - 上传的历史体外分析支持现行乙酸预处理、15/15/30/30 min EDTA 分段测量和 PBS 清洗流程，也显示 1000/10000 Hz 同样下降但幅度较小。其“85%饱和”与“<0.4%/min”定义不一致，均未设为拟合目标。
 - 原始 Excel 和内部分析 docx 不纳入仓库；公开内容仅为代码、去标识化大鼠级目标/预测结果和源数据哈希。
+
+### 当前 Track B：保留原点值结论，B1/B2 评价校准预测区间
+
+原任务与区间任务不互相替代。原 Track B 的目标是同大鼠、同位点、同频率的 $R_Z=Z_{post}/Z_0$ 点值兼容，不是绝对阻抗 $Z$；位点比值随后在大鼠内平均。当前可复现的 19 参数机制 157 全数据 DE 可达性为 `minimax=1.000335`，且当前扩展时间边界下的 22 折逐折独立 DE 留鼠仍有 **10/22 空兼容折**，故原点值任务未通过。空折覆盖率记 NA，不记为 0；该结果与 B1 的 17 参数训练集成空折数是不同模型和采样规则下的指标，不能混用。见 [全数据诊断](results/track_b_interval_rz/v5b_time_best_observation_two_sided_50um_summary.json) 和 [原点值留鼠汇总](results/track_b_interval_rz/original_point_loo/loo_overall.json)。
+
+修订版把研究问题改为：**在已知新大鼠自身基线和实验流程时，预测改性阻抗变化的范围**。B1 是主要结果，B2 是绝对变化量敏感性分析；二者不是原 Track B 的通过证明，也不是两份独立验证证据，因为 $\Delta Z=Z_0(R_Z-1)$。
+
+| 内部 22 折留鼠结果 | B1：$R_Z$，17 参数机制 157 | B2：$\Delta Z$，17 参数机制 19 |
+|---|---:|---:|
+| 校准后总体经验点覆盖率 | **90.82%**（356/392） | **90.31%**（354/392） |
+| 中位区间宽度 | 0.44996 | 13.46721 MΩ |
+| 最大区间宽度 | 1.76634 | 34.43616 MΩ |
+| 逐鼠最低／中位覆盖率 | 65%／95% | 70%／91.875% |
+| 100 Hz 覆盖率 | 91.84% | 90.82% |
+| 120 Hz 覆盖率 | 90.82% | 91.84% |
+| 1000 Hz 覆盖率 | 90.82% | 90.82% |
+| 10000 Hz 覆盖率 | 89.80% | 87.76% |
+
+最终区间是**名义 90% 逐点预测区间**，不是均值置信区间、整条曲线同步置信带或 90% 点预测准确率。训练集成先产生 5/50/95% 分位数；每个外层训练集内部再以五折分组交叉一致性校准逐频扩展，外层留出鼠只参与最终评价。$R_Z$ 下限施加物理非负截断；$\Delta Z$ 可以为负，不作该截断。B1 原点值任务的空折结论不被此区间结果改写。
+
+原始参数集成区间明显过窄：B1/B2 的原始中位宽度分别约为 0.0061 和 2.106 MΩ，校准后增至 0.4500 和 13.467 MΩ。这说明参数兼容集成本身不足以覆盖跨鼠误差；90% 总体覆盖部分由较宽区间实现，因此当前更适合趋势与范围估计，而非精细点值预测。逐鼠和 10 kHz 结果也未全部达到 90%。
+
+上述结果为**内部验证**。机制与结构选择参考过全数据诊断，模型选择没有完全被嵌套在外层训练折内；在用于确认性推断前，应锁定机制和流程并以新大鼠作独立外部验证。B2 使用留出鼠自身基线将共同 $R_Z$ 预测转换为 $\Delta Z$，因此不是对未知基线大鼠绝对 $Z$ 的无条件预测。完整输出见 [B1 总体指标](results/track_b_interval_rz/calibrated_interval/loo_interval_overall.json)、[B1 留出点区间](results/track_b_interval_rz/calibrated_interval/loo_calibrated_point_intervals.csv)、[B2 总体指标](results/track_b_interval_delta_z/calibrated_interval/loo_interval_overall.json) 和 [B2 留出点区间](results/track_b_interval_delta_z/calibrated_interval/loo_calibrated_point_intervals.csv)。源数据、机制输入、代码和结果哈希见 [验证清单](results/track_b_validation_manifest.json)。
 
 ### Track A：文献先验机理与实测趋势
 
@@ -211,6 +255,8 @@ python calibrate.py --data 实验数据.csv --fit stages.edta.k_r_m3_per_mol_s
 - EDTA 和尿素阶段为离心管完全浸没：`stages.edta.boundary_mode=immersed`、`stages.urea.boundary_mode=immersed`，外板和内板均接触同一药液；
 - 体内外板涂抹情景：将相应阶段设为 `outer_only`，内侧零通量；
 - 若研究脑脊液/脑组织暴露效应，必须新增 CSF 和脑组织域，不能继续用零通量代替组织域。
+- 模型保留乙酸→EDTA 的顺序、15/15/30/30 min 换液、测量前 PBS 清洗和固相状态历史；17 参数主线移除的只是额外经验时间弛豫项，并非移除机理时间动力学。
+- 参数文件记录乙酸 1 mL 和 EDTA 25/25/50/50 mL，但当前求解器采用固定主体浓度边界，`bath_volume_ml` **尚未进入有限浴液体积消耗方程**。机理轨迹可连续求解，阻抗则仅在实验测量时刻接受验证，不能把测量点之间的曲线称为已被连续实验验证。
 
 ### Track B v2 解读边界
 - 每条机理轨迹使用 16 组条件 LHS 界面参数（默认 200×16=3200 个复合候选），不增加正向仿真次数；纯基质基线仍使用原始 200 条轨迹。
@@ -229,7 +275,7 @@ python calibrate.py --data 实验数据.csv --fit stages.edta.k_r_m3_per_mol_s
 - 液相质量守恒最大相对误差 < 3×10⁻¹⁰；钙守恒最大绝对残差 < 8×10⁻¹⁴ mol/m²
 - 基准网格相对细网格：EDTA 末钙总量差 0.0046%，面积电阻差 0.0143%
 - 时间步收敛（20 s 相对 5 s）：钙总量与面积电阻相对差均 < 10⁻⁸%
-- 43 项单元测试全过（含无反应极限、SCM 解析验证、浸没边界守恒、分层 k_r、EDTA 位点容量、B v2 及 B v3 四频观测层测试）
+- 77 项单元测试全过（含无反应极限、SCM 解析验证、曲面体积守恒、分层 k_r、板障极化、B1/B2 区间校准及历史 B v2/v3 回归）
 - B v3 独立复算评分最大差约 3.6×10⁻¹⁵；34 个输出文件完整复跑逐字节一致，记录的输入哈希全部匹配
 - 网页用于轻量交互演示；定量结果以 Python 参考输出为准
 

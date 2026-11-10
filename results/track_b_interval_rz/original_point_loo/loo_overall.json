@@ -1,0 +1,17 @@
+{
+  "role": "FOLD_INDEPENDENT_DE_COMPATIBLE_SETS_NO_FULL_DATA_CANDIDATES",
+  "model": "frequency_surface_time_polarization_19_parameter",
+  "mechanism_id": 157,
+  "structure": "two_sided_50um",
+  "fold_count": 22,
+  "empty_fold_count": 10,
+  "degenerate_fold_count": 0,
+  "all_folds_nonempty": false,
+  "all_folds_nondegenerate": false,
+  "point_coverage": 0.19811320754716982,
+  "median_interval_width": 0.018695479085863498,
+  "available_point_count": 212,
+  "total_point_count": 392,
+  "coverage_empty_fold_rule": "NA_NOT_ZERO",
+  "note": "Conditional on the fixed mechanism trajectory; not external validation."
+}

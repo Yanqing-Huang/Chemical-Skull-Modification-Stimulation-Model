@@ -1,0 +1,20 @@
+{
+  "role": "FOLD_INDEPENDENT_DELTA_Z_COMPATIBLE_SETS",
+  "target": "Delta-Z in MOhm; own-rat/site/frequency baseline subtracted before site averaging",
+  "center_model": "frequency_surface_polarization_17_parameter",
+  "mechanism_id": 19,
+  "structure": "two_sided_50um",
+  "fold_count": 22,
+  "empty_fold_count": 0,
+  "degenerate_fold_count": 0,
+  "all_folds_nonempty": true,
+  "all_folds_nondegenerate": true,
+  "point_coverage": 0.19387755102040816,
+  "median_interval_width_mohm": 1.1660663852651263,
+  "per_rat_coverage_min": 0.0,
+  "per_rat_coverage_median": 0.16875,
+  "available_point_count": 392,
+  "total_point_count": 392,
+  "coverage_empty_fold_rule": "NA_NOT_ZERO",
+  "interpretation": "Delta-Z sensitivity target; does not rewrite original R-Z Track B results."
+}

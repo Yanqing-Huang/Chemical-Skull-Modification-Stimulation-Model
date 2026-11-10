@@ -2,5 +2,10 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+.trae/
+*.xlsx
+*.xls
+*.docx
 results/calibration/
 results/**/*.partial.csv
+results/**/*.running.csv

@@ -46,6 +46,11 @@ class Grid:
     initial_porosity: np.ndarray
     tortuosity: np.ndarray
     layer_slices: tuple[slice, slice, slice]
+    # Per-outer-area cell volumes and local area ratios. Both default to the
+    # planar grid; a finite outer curvature radius defines a convex shell.
+    cell_volumes: np.ndarray
+    cell_areas: np.ndarray
+    face_areas: np.ndarray
 
     @classmethod
     def from_parameters(
@@ -84,6 +89,24 @@ class Grid:
             q_reference[layer_slice] = layer["initial_calcium_mol_per_m3"]
             initial_porosity[layer_slice] = layer["porosity"]
             tortuosity[layer_slice] = layer["tortuosity"]
+        radius = values["geometry"].get("outer_curvature_radius_m")
+        if radius is None:
+            face_areas = np.ones_like(edges)
+            cell_areas = np.ones_like(centers)
+            cell_volumes = widths.copy()
+        else:
+            radius = float(radius)
+            if not np.isfinite(radius) or radius <= float(edges[-1]):
+                raise ValueError("Outer curvature radius must exceed total skull thickness")
+            # Convex shell coordinate x points inward from the outer surface.
+            # A(x)/A_outer = (1-x/R)^2; integrate it exactly over each cell.
+            face_areas = (1.0 - edges / radius) ** 2
+            cell_areas = (1.0 - centers / radius) ** 2
+            cell_volumes = widths * (
+                1.0 - (edges[:-1] + edges[1:]) / radius
+                + (edges[:-1] ** 2 + edges[:-1] * edges[1:] + edges[1:] ** 2)
+                / (3.0 * radius**2)
+            )
         return cls(
             edges=edges,
             centers=centers,
@@ -93,6 +116,9 @@ class Grid:
             initial_porosity=initial_porosity,
             tortuosity=tortuosity,
             layer_slices=tuple(slices),
+            cell_volumes=cell_volumes,
+            cell_areas=cell_areas,
+            face_areas=face_areas,
         )
 
 
@@ -133,13 +159,13 @@ class ScenarioResult:
 
     def stage_mass_residuals(self, stage_name: str) -> dict[str, float]:
         result = self.stages[stage_name]
-        liquid = np.sum(result.liquid_amount * self.grid.widths[None, :], axis=1)
+        liquid = np.sum(result.liquid_amount * self.grid.cell_volumes[None, :], axis=1)
         liquid_residual = liquid + result.cumulative_liquid_cleared_mol_per_m2 - (
             result.cumulative_inflow_mol_per_m2 - result.cumulative_reaction_mol_per_m2
         )
         calcium_loss = np.sum(
             (result.initial_calcium[None, :] - result.calcium)
-            * self.grid.widths[None, :],
+            * self.grid.cell_volumes[None, :],
             axis=1,
         )
         stage_values = self.values["stages"][stage_name]
@@ -261,7 +287,8 @@ def area_resistance_ohm_m2(
         * porosity ** electrical["archie_exponent"]
     )
     # Cells are series resistances; retain the spatial decalcification gradient.
-    return float(np.sum(grid.widths / conductivity))
+    # In a convex shell the inward area decreases, so dR/A_outer = dx/(sigma*A/A_outer).
+    return float(np.sum(grid.widths / (conductivity * grid.cell_areas)))
 
 
 def _jacobian_sparsity(n: int, immersed: bool = False):
@@ -350,15 +377,16 @@ def simulate_stage(
                 * np.diff(concentration)
                 / center_distances
             )
-        diffusion = -(flux[1:] - flux[:-1]) / grid.widths
+        area_flux = grid.face_areas * flux
+        diffusion = -(area_flux[1:] - area_flux[:-1]) / grid.cell_volumes
 
         reaction = reaction_rate_mol_per_m3_s(
             grid, values, stage_name, concentration, calcium_nonnegative, diffusivity
         )
         d_amount = diffusion - stoichiometry * reaction
         d_calcium = -reaction
-        d_inflow = flux[0] - flux[n]
-        d_reaction = stoichiometry * float(np.sum(reaction * grid.widths))
+        d_inflow = area_flux[0] - area_flux[n]
+        d_reaction = stoichiometry * float(np.sum(reaction * grid.cell_volumes))
         return np.concatenate([d_amount, d_calcium, [d_inflow, d_reaction]])
 
     solution = solve_ivp(
@@ -445,7 +473,7 @@ def _simulate_segmented_stage(
     previous: StageResult | None = None
     for result in results:
         if previous is not None:
-            cleared_offset += float(np.sum(previous.liquid_amount[-1] * grid.widths))
+            cleared_offset += float(np.sum(previous.liquid_amount[-1] * grid.cell_volumes))
         time_parts.append(result.time_s + elapsed)
         inflow_parts.append(result.cumulative_inflow_mol_per_m2 + inflow_offset)
         reaction_parts.append(result.cumulative_reaction_mol_per_m2 + reaction_offset)

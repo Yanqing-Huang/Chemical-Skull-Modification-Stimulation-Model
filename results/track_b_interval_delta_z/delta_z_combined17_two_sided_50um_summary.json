@@ -1,0 +1,24 @@
+{
+  "role": "FULL_DATA_DELTA_Z_REACHABILITY_NOT_ORIGINAL_TRACK_B",
+  "target": "post-treatment Z minus same-rat/site/frequency baseline, site-averaged in MOhm",
+  "prediction_conversion": "mean_site_baseline * (common_predicted_R_Z - 1)",
+  "structure": "two_sided_50um",
+  "model": "delta_z_combined17",
+  "compatible_count": 1,
+  "best_mechanism_id": 19,
+  "best_minimax": 0.801128381607073,
+  "best_normalized_rmse": 0.7665686864770882,
+  "best_raw_rmse_mohm": {
+    "100": 5.7529975111639065,
+    "120": 5.637642606744213,
+    "1000": 2.6719917812496714,
+    "10000": 0.0026791294373552737
+  },
+  "tolerances_mohm": {
+    "100": 7.846268116792213,
+    "120": 7.7490653286711595,
+    "1000": 3.3352853832111458,
+    "10000": 0.003344194906148001
+  },
+  "best_boundary_parameter_indices": ""
+}
