@@ -2,6 +2,86 @@
 
 SD 大鼠颅骨化学改性的三层理论模型，含体外阻抗趋势对照、平台绑定等效标定与留鼠内部验证。
 
+> **2026 低频更新**：新增 [矫正后 TrackA (A1) 与 TrackB 校准区间模型](#低频矫正后模型与拟合效果100120-hztracka-a1--trackb-校准区间)，含 7 张拟合效果图与完整验证口径；下述原始机理主线与历史结果完整保留。
+
+## 低频矫正后模型与拟合效果（100/120 Hz，TrackA A1 + TrackB 校准区间）
+
+> 本轮内容位于 `corrected_models/`，为**纯新增**：不改动机理主线、不覆盖 A0 / B0 原始版本与任何历史结果，全部改动可追溯。原始模型 `σ = 1e-4 + 1.5·φ^m`、空间串联积分 `R = Σ Δx_i/(σ_i A_i)` 保持不变。
+
+原始全频段模型在低频下存在**幅度系统性偏差**（A0 群体条件均值层 R² = −7.906、Bias = −0.510、Pearson r = 0.885：趋势相关但幅值失配）。本轮**仅在 100/120 Hz** 范围做双线修正，并补齐拟合效果图与验证口径：
+
+- **Track A · A1 经验校正**：`R_Z_corr = a + b·R_Z_raw`，`a = −4.4715`、`b = 5.6806`（基线按物理定义锚定 `R_Z(t=0) = 1.0`）。**这是经验线性校正，不是机理改进**。
+- **Track B · 嵌套校准区间**：保留 LHS 集成 + 22 折留一大鼠外层 × 5 折分组内层 conformal 校准；`lower = clip(q05 − p, 0, 1)`、`upper = clip(q95 + p, 0, 1)`，`p_(fold,f) = tolerance_f · q_f`，`q_f` 为内层交叉拟合分数的 0.90 分位数。**不报告 R²/RMSE**。
+
+### 表 1　Track A 点预测指标汇总
+
+| 模型 / 验证层级 | R² | RMSE | MAE | Bias |
+|---|---:|---:|---:|---:|
+| Track A 原始模型 A0（群体条件均值, n=48） | −7.906 | 0.533 | 0.510 | −0.510 |
+| Track A A1 校正（full OLS, n=48） | 0.782 | 0.083 | 0.069 | 0.000 |
+| Track A 群体均值 LOCO（留一条件外推） | 0.762 | 0.087 | — | — |
+| Track A 个体级 LORO（留一大鼠外推） | 0.588\* | 0.130 | 0.105 | 0.000 |
+
+\* 0.588 是**个体级 LORO 总体 R²**，逐鼠 R² 均值仅 **0.404**（WT17、WT2 为负）。0.762 是**群体条件均值**的 LOCO 结果——两者预测层级不同（单鼠外推 vs 群体均值），**不能表述为"性能从 0.762 下降到 0.588"**。所有 R² / RMSE / MAE 均基于同一组真值与预测值，并标注验证层级。实验为**被试间设计**（每鼠仅一种 EDTA 浓度，6 鼠/浓度）。
+
+**Track B 区间预测（单独汇报，逐点口径，不与 Track A 的 R² 混比）**：逐点覆盖率 **0.913**（目标 0.90）、平均区间宽度 **0.366**、Winkler(α_mis = 0.10) **0.454**；n = 196 点 = 22 鼠 × 2 频率 × 5 个改性时间点（乙酸 → EDTA 90 min，**不含基线 t=0 与尿素 t=105**）。
+
+| 分层 | 覆盖率 | 平均宽度 | n |
+|---|---:|---:|---:|
+| 总体 | 0.913 | 0.366 | 196 |
+| TRAINING_COMPATIBLE_ENSEMBLE | 0.857 | 0.376 | 98 |
+| NEAREST_TRAINING_ENSEMBLE（compatible_count=0 回退） | 0.969 | 0.356 | 98 |
+
+- 合并覆盖率 0.913 **掩盖了两种 ensemble 模式的分裂**（一半欠覆盖、一半过保守）；B2 校准对照必须控制 `ensemble_role`。
+- **0.05 M 剂量只出现在 TRAINING_COMPATIBLE 模式**（覆盖率 0.768），故"0.05 M 欠覆盖"实为**剂量—模式混淆**，不能解释为剂量效应。
+- 区间宽度约 **97% 来自 conformal padding**，基础 LHS 参数不确定仅 ~3%：过宽根因是**校准层在补偿"仿真 vs 实测"的系统性偏差与个体差异**，不是参数采样不足，因此**不应扩大 LHS 采样范围**。
+- 验证集为 **22/24 鼠**（缺 WT5 (0.10 M)、WT6 (0.15 M)）；WT17、WT9、WT8 等表现不佳个体**全部保留、不删除**。
+
+### 拟合效果图（7 张）
+
+全部图**纵坐标自 0 起**，实测为 **N = 6 均值 ± SEM**，**7 个时间点（基线 → 尿素）完整绘出**，无裁剪。
+
+**图 A · Track A 校正模型拟合效果**（实测 ±SEM vs A1 校正预测，剂量 × 频率 8 面板）——模型能否跟踪阻抗随时间的下降趋势
+
+![图A TrackA A1 校正拟合](corrected_models/figures/figA_trackA_fit.png)
+
+**图 B · Track A 预测值 vs 真实值**（含 y = x 参考线与 R² / RMSE / MAE 标注）——预测与真实的一致程度
+
+![图B TrackA 预测-真实散点](corrected_models/figures/figB_trackA_scatter.png)
+
+**图 E · Track A 残差诊断**（残差 vs 时间 / vs 预测值，均含 y = 0 参考线）——是否存在系统性偏差、误差是否随时间增大。残差并非完全无结构：早期偏低、后期偏高，提示 A1 经验校正仍有轻微未建模非线性。
+
+![图E TrackA 残差诊断](corrected_models/figures/figE_trackA_residuals.png)
+
+**图 F · Track A 不同剂量误差对比**（RMSE / MAE / Bias，原始 vs A1，每剂量 n = 12）——避免总体误差掩盖条件级拟合问题
+
+![图F TrackA 误差按剂量](corrected_models/figures/figF_trackA_error_by_dose.png)
+
+**图 C · Track B 校准区间拟合效果**（实测 ±SEM vs 校准预测区间阴影，剂量 × 频率 8 面板）——真实观测是否落入区间、区间是否过宽。实测画满 7 点完整轨迹；**校准区间仅在 Track B 验证覆盖的 5 个改性时间点叠加**，基线/尿素时段为灰虚线标注的"无区间"区，不视为模型失败。
+
+![图C TrackB 校准区间拟合](corrected_models/figures/figC_trackB_fit.png)
+
+**图 D · Track B 区间覆盖诊断**（逐时间点覆盖率 / 宽度：总体、按 ensemble 模式、按剂量，含 90% 目标线）——覆盖率是否稳定、宽度是否合理
+
+![图D TrackB 覆盖诊断](corrected_models/figures/figD_trackB_coverage.png)
+
+**图 G · 表 1 指标汇总**（一页可汇报的性能口径）
+
+![图G 表1 指标汇总](corrected_models/figures/figG_table1.png)
+
+### 口径声明与遗留问题
+
+1. 误差棒为 **N = 6 均值 ± SEM**（实验观测的离散程度），**不等于**模型预测区间；区间中点是区间中点，**不是**独立的点预测结果。
+2. Track B 的覆盖率是**逐点覆盖率**，**不是**整条时间曲线同时落入区间的概率。
+3. **A1 是经验校正**，仅作工程预测对照，不构成机理改进；物理可解释的改进需 A2 参数敏感性实验与 A3 电学映射一致性审计。
+4. 机制 `mechanism_id = 157` / `two_sided_50um` 由**全数据诊断选定**，未在每个外层训练折内重选，存在乐观偏差；严格折内验证（B3）待做。
+5. 本地 Excel 与上游 manifest 声明的 SHA 不一致、原始文件不可得；权威冻结数据为 24 鼠 `measured` CSV（含 SHA-256 清单与 14 处异常 / 32 条重复记录核查报告）。
+6. 以上均为**内部留鼠验证**，不是独立外部验证。
+
+完整口径见 [`corrected_models/README.md`](corrected_models/README.md)；验证报告见 [`corrected_models/validation/`](corrected_models/validation/)（A1 大鼠级 LORO、TrackB B1 区间误差诊断、数据差异报告、拟合结论、复现脚本）。
+
+---
+
 ## 快速开始
 
 ### 在线交互网页（推荐）
@@ -30,6 +110,9 @@ python run_interval_prediction.py --target delta --mechanism-id 19 --workers 2 \
   --data /本地路径/体外EDTA数据记录汇总.xlsx \
   --output results/track_b_interval_delta_z/calibrated_interval
 python -m unittest discover -s tests -v   # 77 项单元测试
+# 低频（100/120 Hz）矫正后模型，纯新增，可独立运行自检
+python corrected_models/trackA_A1/model.py          # Track A：A1 经验校正
+python corrected_models/trackB_calibrated/model.py  # Track B：校准区间查询
 ```
 
 ## 模型结构
@@ -95,7 +178,14 @@ $$\frac{\partial(\varepsilon c_j)}{\partial t} = \frac{\partial}{\partial x}\lef
 │   ├── track_b_interval_rz/              # 原 R_Z 点值对照与 B1 校准区间
 │   ├── track_b_interval_delta_z/         # B2 ΔZ 诊断、基础留鼠与校准区间
 │   └── trend_comparison/                 # 趋势对照输出
-└── index.html                           # 在线交互仿真（轻量近似，定量以 Python 为准）
+├── index.html                           # 在线交互仿真（轻量近似，定量以 Python 为准）
+└── corrected_models/                    # 低频 100/120 Hz 矫正后模型（纯新增，不改动机理主线）
+    ├── README.md                        # 完整口径声明
+    ├── trackA_A1/                       # A1 经验校正：model.py / parameters.json / 指标 CSV
+    ├── trackB_calibrated/               # 嵌套校准区间：model.py / parameters.json / 区间 CSV
+    ├── data/                            # 冻结 24 鼠数据 + SHA-256 清单 + 机理先验 CSV
+    ├── figures/                         # 7 张拟合效果图（figA–figG）
+    └── validation/                      # A1 LORO / B1 诊断 / 数据差异 / 拟合结论 / 复现脚本
 ```
 
 ## 当前理论预测（EDTA 浓度扫描，30 min）
