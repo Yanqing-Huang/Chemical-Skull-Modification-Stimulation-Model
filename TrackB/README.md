@@ -40,3 +40,18 @@ calibrated_upper = clip(sim_q95 + p, 0, 1)
 这些是**既有 392 点 LOO 校准区间按条件切片的统计**，本轮**未重新拟合、未重新校准** TrackB。
 已知限制：验证集 22/24 鼠（缺 WT5 0.10 M、WT6 0.15 M）；0.05 M 存在 role×剂量混淆；
 上游机制选择非严格嵌套；覆盖率最低 3 鼠为 WT17 / WT9 / WT8（按铁律 A8 保留，未删除）。
+
+## 本模型涉及的机理原理
+
+> 见 [`../docs/MECHANISM_PRINCIPLE.md`](../docs/MECHANISM_PRINCIPLE.md) 第 1–3、7.6、8.3、9 节。
+
+- **机理 ensemble**：对机理参数做 **Latin Hypercube Sampling**，输出 `sim_q05 / q50 / q95`；
+  区间的「形状」来自机理方程（EDTA 脱钙 → Archie 电导 `sigma = sigma_floor + c·phi^m` →
+  串联积分 → 归一化 `R_Z=Z/Z0`），即总纲第 1–3 节的机理底座。
+- **conformal 校准**：`p_(fold,f) = tolerance_f × q_f`（`q_f = Quantile_0.90` 内层 cross-fit 分数），
+  `lower = clip(q05−p, 0, 1)`、`upper = clip(q95+p, 0, 1)`；目标覆盖率 0.90，Winkler `alpha_mis=0.10`。
+- **宽度根因（B1 诊断）**：最终宽度约 **97.09%** 来自 padding，基础 LHS 参数不确定性仅 **3.00%** ——
+  padding 补偿的是「仿真 vs 实测」的**系统性偏差**，不是参数采样范围不足，
+  因此**盲目扩大 LHS 采样没有用**。
+- **边界**：逐点覆盖率 ≠ 整条曲线联合覆盖；基线 t=0 与尿素 t=105 无校准区间；
+  只报 coverage / width / Winkler，**不报 R² / RMSE**，也不与 TrackA 点预测横比。

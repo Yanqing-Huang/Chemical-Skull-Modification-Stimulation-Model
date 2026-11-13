@@ -349,7 +349,7 @@ python make_figures.py              # 重绘 fig1-fig10 拟合效果图
 |---|---|
 | **本文件 `EVALUATION_CRITERIA.md`** | **评价标准与验收口径的唯一权威清单（本文件）** |
 | `four_conditions/THREE_ROUTES_CONCLUSION.md` | 四条件拟合结论与取舍 |
-| `docs/MECHANISM_PRINCIPLE.md` | 机理 + 经验原理推导 |
+| `docs/MECHANISM_PRINCIPLE.md` | **机理模型原理总纲（唯一权威）**：完整推导、符号量纲、逐模型溯源、可辨识性、数值对照、诚实边界 |
 | `four_conditions/MODEL_DEFINITIONS.md` | 三条路线定义、公式、命名映射 |
 | `TrackA1/`、`TrackA2/`、`TrackA3/`、`TrackB/README.md` | 各模型定义与本模型成绩单摘要 |
 | `validation/` | LORO / B1 padding 诊断 / 数据差异 / 拟合效果留痕 |

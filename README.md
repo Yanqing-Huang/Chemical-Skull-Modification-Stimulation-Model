@@ -14,6 +14,32 @@
 | **TrackA3 机理驱动经验** | `TrackA3/` | A2 机理骨架 + 2 个受约束保形校准系数（eta=1,eps=0 退化为 A2） | 骨架 100% + 经验校准 |
 | TrackB | `TrackB/` | 校准后的 LOO 预测区间（392 点全频 + 196 点低频） | 机理 ensemble + conformal padding |
 
+## 机理模型原理（必读 · 本轮新增）
+
+**唯一权威总纲：[`docs/MECHANISM_PRINCIPLE.md`](docs/MECHANISM_PRINCIPLE.md)** —— 把此前 121 行的「机理+经验」概览
+扩充为**逐条、逐模型**的完整原理总纲，覆盖所有含机理成分的模型：TrackA1（A1.2 / A1.3）、TrackA2、TrackA3、TrackB。
+
+![机理模型原理总览](four_conditions/figures/fig12_mechanism_principles.png)
+
+| 原理 | 内容 | 对应模型 |
+|---|---|---|
+| 一 EDTA 脱钙化学 | 羟基磷灰石 + EDTA 螯合 Ca → 孔隙率 `phi` 上升 | 全部（物理起点） |
+| 二 Archie 电导 | `sigma = sigma_floor + c·phi^m`，符号与量纲 | 机理先验 / A2 |
+| 三 串联积分与归一化 | `R = Σ dx/(sigma·A)`、`R_Z = Z/Z0`、`t=0≡1`；旧机理三个结构性缺口 | 全部 |
+| 四 界面极化 / CPE 并联导纳 | `Y = G_ion(t,d) + G_pol(f)`，解释「高频 `R_Z` 系统性偏高」 | A2 / A1.3 |
+| 五 `delta_eff` 完整推导 | `Y(0)/Y(t) → 1/(1+delta_eff)`；4 个物理量 + 3 个参考标度 + 数学性质 | A2 |
+| 六 参数可辨识性 | `G0` 与 `rho` 尺度冗余 → 6→5→4 参数 → 边界命中诊断 | A2 / A3 / A1 系列 |
+| 七 逐模型机理溯源 | 每个模型的机理输入、来源、经验层、自包含性 | A1.1 / A1.2 / A1.3 / A2 / A3 / TrackB |
+| 八 落盘数值对照 | 四条件 LORO / A2 跨条件零重拟合迁移 / TrackB 区间指标 | 全部 |
+| 九 诚实边界 | 标定≠第一性原理、`s` 非被辨识 CPE 指数、尿素回升、padding 97% | 全部 |
+
+总纲**附录 A 是符号与量纲总表**；所有数值由 `four_conditions/make_mechanism_principles.py` 从落盘结果自动渲染，
+**未重新拟合、未改模型**。四个模型 README 也各带「本模型涉及的机理原理」摘要 ——
+**机理模型涉及的原理在 TrackA 与 TrackB 目录层面也都写进去了**。
+
+> 关键澄清：严格链条是「CPE 旁路导纳随 `f` 上升 → 分母 `(G0+G_pol)` 变大 → `delta_eff` 被稀释 →
+> `delta_eff ∝ f^(-s)`」；早期概览把 `G_pol(f) ~ (f/F0)^(-s)` 作为等效简写，已在总纲 5.1 节补全推导。
+
 ## 评价标准与验收口径（必读 · 本轮新增）
 
 **唯一权威清单：[`docs/EVALUATION_CRITERIA.md`](docs/EVALUATION_CRITERIA.md)** —— 把此前散落在 README 口径声明、
@@ -67,6 +93,7 @@ C1 全条件下 **A2 纯机理（4 参数、零经验层）LORO=0.486 反超三�
 | `fig9_trackB_four_conditions.png` | TrackB 四条件覆盖率 / 宽度 / Winkler |
 | `fig10_table1.png` | 表1 四条件 x 五模型完整指标 |
 | **`fig11_evaluation_criteria.png`** | **评价标准与验收口径总览**（验证层级 / 5 类标准清单 / 五模型 x 四条件 LORO 达标矩阵） |
+| **`fig12_mechanism_principles.png`** | **机理模型原理总览**（6 步机理链路 / 并联等效电路 / 频率内生曲线 / 参数量纲表） |
 
 ![C1 全部条件完整拟合效果](four_conditions/figures/fig2_fit_C1_all.png)
 
@@ -104,7 +131,8 @@ pip install -r requirements.txt
 cd four_conditions
 python run_three_routes.py          # 计算：四条件 x 五模型 full / LOCO / LORO + TrackB 切片
 python make_figures.py              # 绘图：fig1-fig10 写入 figures/
-python make_evaluation_criteria.py  # 评价标准总纲 EVALUATION_CRITERIA.md + fig11
+python make_evaluation_criteria.py   # 评价标准总纲 EVALUATION_CRITERIA.md + fig11
+python make_mechanism_principles.py  # 机理模型原理总纲 MECHANISM_PRINCIPLE.md + fig12
 ```
 
 每个 `model.py` 可独立 import 并调用 `predict(dose, t_min, freq_hz)`；
