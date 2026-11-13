@@ -1,0 +1,33 @@
+{
+  "model_id": "TrackA2",
+  "route": "A2",
+  "route_name": "TrackA2 纯机理模型",
+  "label": "A2 并联导纳纯机理（频率内生）",
+  "formula": "R_Z = 1/(1+a0*(d/0.10)^b*(t/100)^p*(f/100)^(-s))",
+  "mechanism_input": "全部来自机理方程（Archie + 脱钙动力学 + CPE 并联导纳）",
+  "params": [
+    4.662921291044303,
+    0.3138527983128187,
+    0.7963268085927386,
+    0.23181099338669614
+  ],
+  "k": 4,
+  "family": "mech",
+  "fit_scope": "C1 全部条件（4 剂量 x 4 频率 x 6 改性时间，96 条件节点）",
+  "baseline_pred_uncorrected": 1.0,
+  "metrics": {
+    "full_r2": 0.9185302218009449,
+    "rmse": 0.0609976280477987,
+    "full_aic": -527.0086976052153,
+    "loco_r2": 0.9100516088341968,
+    "loro_r2": 0.4864651751641933,
+    "loro_per_rat_mean_r2": 0.5146009987971835
+  },
+  "four_conditions_loro": {
+    "C1_all": 0.4864651751641933,
+    "C2_lowfreq": 0.7087759225614627,
+    "C3_highdose": 0.6013733478687883,
+    "C4_lf_hd": 0.7396942046286998
+  },
+  "label_honest": "calibrated model; fitted coefficients are not proof of mechanism"
+}

@@ -1,6 +1,10 @@
 {
-  "model_id": "TrackA_A2",
-  "formula": "A2 协变量扩展 +t+ln(f)",
+  "model_id": "TrackA1.2",
+  "route": "A1",
+  "route_name": "TrackA1 纯经验模型",
+  "label": "A1.2 A+ 协变量",
+  "formula": "R_Z = a + b*R_Z_raw + c*t + d*ln(f/100)",
+  "mechanism_input": "机理先验 R_Z_raw 作一个查表特征",
   "params": [
     -1.946361716318694,
     2.8751358559009206,
@@ -8,11 +12,13 @@
     0.048862111779526624
   ],
   "k": 4,
+  "family": "emp",
   "fit_scope": "C1 全部条件（4 剂量 x 4 频率 x 6 改性时间，96 条件节点）",
   "baseline_pred_uncorrected": 0.9287741395822267,
   "metrics": {
     "full_r2": 0.8815426843200742,
     "rmse": 0.07355219264774242,
+    "full_aic": -491.07392397766745,
     "loco_r2": 0.8712538807193037,
     "loro_r2": 0.47380895723798233,
     "loro_per_rat_mean_r2": 0.4719162177678597
@@ -23,5 +29,5 @@
     "C3_highdose": 0.5731440777808712,
     "C4_lf_hd": 0.680132551550588
   },
-  "label": "corrected model; empirical calibration, NOT a mechanistic proof"
+  "label_honest": "calibrated model; fitted coefficients are not proof of mechanism"
 }
