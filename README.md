@@ -14,6 +14,28 @@
 | **TrackA3 机理驱动经验** | `TrackA3/` | A2 机理骨架 + 2 个受约束保形校准系数（eta=1,eps=0 退化为 A2） | 骨架 100% + 经验校准 |
 | TrackB | `TrackB/` | 校准后的 LOO 预测区间（392 点全频 + 196 点低频） | 机理 ensemble + conformal padding |
 
+## 评价标准与验收口径（必读 · 本轮新增）
+
+**唯一权威清单：[`docs/EVALUATION_CRITERIA.md`](docs/EVALUATION_CRITERIA.md)** —— 把此前散落在 README 口径声明、
+结论文档、机理原理、各模型 README 与 `validation/` 留痕里的评价标准**全部收拢、逐条定义，
+并给出 TrackA1（A1.1 / A1.2 / A1.3）、TrackA2、TrackA3、TrackB 每个模型在每一条标准下的数值**。
+所有数值由 `four_conditions/make_evaluation_criteria.py` 从落盘结果自动渲染，未重新拟合、未改模型。
+
+![评价标准与验收口径总览](four_conditions/figures/fig11_evaluation_criteria.png)
+
+| 标准类 | 条目 | 覆盖对象 | 核心内容 |
+|---|---|---|---|
+| **A 类** 验证层级与数据切分 | 8 | TrackA / TrackB | `full` < `LOCO` < **LORO（唯一验收口径）**；折数、评价集规模、数据版本 gate、不利样本保留 |
+| **B 类** 点预测指标 | 12 | **A1.1 / A1.2 / A1.3 / A2 / A3** | R² / RMSE / MAE / bias / AIC / k / 基线 t=0 / 参数可辨识性 / 物理可解释性 / 去尿素稳健性 / 跨条件零重拟合迁移 / 自包含性 |
+| **C 类** 区间指标 | 9 | **TrackB** | coverage / width（均值·中位·最大）/ Winkler / padding 占比 / 逐点≠联合 / 无区间时段 / padding 公式；**不报 R² / RMSE** |
+| **D 类** 绘图验收 | 6 | 全部拟合图 | 7 时间点 + SEM 全画、纵轴自 0 起、5 条模型曲线全画、无遮挡无缺字、位置一致 |
+| **E 类** 判定铁律 | 10 | 全部结论 | 不可横比 / 收窄≠变好 / 拟合≠机理 / 指标≠可用 / 噪声级 / 多重比较 / 逐鼠方差 / 尿素回升 / s 非被辨识 / 不构成机理被证实 |
+
+总纲第 3 节是**五个 TrackA 模型各一张完整数值矩阵**（全 24 列指标 × 四条件），
+第 4 节是**逐模型成绩单**（每条标准逐项判读与硬伤），第 5 节是 A2 跨条件零重拟合迁移证据，
+第 6 节是 **TrackB 四条件区间指标与达标判读**，第 7 节是验收流程。
+各模型 README 也带本模型的成绩单摘要 —— **TrackA 与 TrackB 都已写进去**。
+
 ## 四条件拟合（本次核心）
 
 | 条件 | 剂量 | 频率 | 节点 | LORO 折数 |
@@ -44,10 +66,14 @@ C1 全条件下 **A2 纯机理（4 参数、零经验层）LORO=0.486 反超三�
 | `fig8_architecture.png` | 三路线架构、机理含量与共享机理底座 |
 | `fig9_trackB_four_conditions.png` | TrackB 四条件覆盖率 / 宽度 / Winkler |
 | `fig10_table1.png` | 表1 四条件 x 五模型完整指标 |
+| **`fig11_evaluation_criteria.png`** | **评价标准与验收口径总览**（验证层级 / 5 类标准清单 / 五模型 x 四条件 LORO 达标矩阵） |
 
 ![C1 全部条件完整拟合效果](four_conditions/figures/fig2_fit_C1_all.png)
 
-## 口径声明（务必阅读）
+## 口径声明（务必阅读 · 细则）
+
+> 以下是最常用的 6 条速记；**完整定义、公式、优先级、口径出处与逐模型数值见
+> [`docs/EVALUATION_CRITERIA.md`](docs/EVALUATION_CRITERIA.md)**（A / B / C / D / E 五类共 45 条标准）。
 
 1. **三条路线都是「有物理动机或数据动机的参数化」，不构成机理被证实**。
    A2 的物理参数由实测标定，不是从第一性原理推导；`s` 是等效频散指数，不是被辨识的 CPE 指数。
@@ -59,6 +85,10 @@ C1 全条件下 **A2 纯机理（4 参数、零经验层）LORO=0.486 反超三�
 5. 基线 t=0 按物理定义 R_Z=1：A1.1 / A1.3 / A2 / A3 天然满足，**A1.2 (A+) 需人为锚定**。
 6. 数据：修订版《体外EDTA数据记录汇总.xlsx》SHA `4c165298...`，三层核验见 `data/data_verification.json`。
    保留全部 24 鼠，**未删除 WT17 / WT9 / WT8 等不利样本**；14 处 urea_10/Midpoint/WT21-24 转录异常标记未决。
+
+> 五个 TrackA 模型的完整数值矩阵（总纲第 3 节）、逐模型成绩单（第 4 节）、
+> TrackB 区间达标判读（第 6 节）与验收流程（第 7 节）见
+> [`docs/EVALUATION_CRITERIA.md`](docs/EVALUATION_CRITERIA.md)。
 
 ## OPEN ISSUES
 
@@ -72,8 +102,9 @@ C1 全条件下 **A2 纯机理（4 参数、零经验层）LORO=0.486 反超三�
 ```bash
 pip install -r requirements.txt
 cd four_conditions
-python run_three_routes.py    # 计算：四条件 x 五模型 full / LOCO / LORO + TrackB 切片
-python make_figures.py        # 绘图：10 张图写入 figures/
+python run_three_routes.py          # 计算：四条件 x 五模型 full / LOCO / LORO + TrackB 切片
+python make_figures.py              # 绘图：fig1-fig10 写入 figures/
+python make_evaluation_criteria.py  # 评价标准总纲 EVALUATION_CRITERIA.md + fig11
 ```
 
 每个 `model.py` 可独立 import 并调用 `predict(dose, t_min, freq_hz)`；
