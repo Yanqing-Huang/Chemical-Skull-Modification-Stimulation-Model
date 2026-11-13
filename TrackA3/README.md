@@ -47,3 +47,12 @@ R_Z    = 1 - eta*(1 - R_mech) - eps*(t/105)
   （四条件 LORO 相对 A2 +0.028 ~ +0.040）。
 - **诚实边界**：「机理驱动」指结构来自机理，不指全部参数可溯源（E10）；`delta_eff` 单调，
   尿素 t=105 回升无法表达（E8）；物理量由实测标定、非第一性原理推导（总纲 M1/M4/M5）。
+
+<!-- ALL_METRICS_COMPUTED -->
+### 全评价标准实算（本轮新增）
+
+> 机理驱动经验模型 **A3 机理驱动经验** 的 R²、RMSE、残差、信息准则、校准、正态性/自相关/异方差检验等
+> 全部指标已实际算出数值，见唯一权威总表
+> [`../docs/ALL_METRICS_COMPUTED.md`](../docs/ALL_METRICS_COMPUTED.md) 第 3–4 节，
+> 主表 `../four_conditions/ALL_METRICS_FULL.csv`，逐点残差 `../four_conditions/RESIDUALS_LONG.csv`。
+> 45 条标准逐条回填见 `../four_conditions/STANDARDS_COMPUTED.csv`。

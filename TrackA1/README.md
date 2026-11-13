@@ -43,3 +43,12 @@ A1.1 样本内 full R² 在 C2 / C4 达 0.962 / 0.982（全场最高），但按
 
 共享机理底座（EDTA 脱钙化学 → Archie 电导 `sigma = sigma_floor + c·phi^m` → 串联积分 → 归一化 `R_Z=Z/Z0`）
 见总纲第 1–3 节；三者均为经验校正，**不构成机理被证实**（总纲 M1/M7）。
+
+<!-- ALL_METRICS_COMPUTED -->
+### 全评价标准实算（本轮新增）
+
+> 三个纯经验模型 **A1.1 / A1.2 / A1.3** 的 R²、RMSE、残差、信息准则、校准、正态性/自相关/异方差检验等
+> 全部指标已实际算出数值，见唯一权威总表
+> [`../docs/ALL_METRICS_COMPUTED.md`](../docs/ALL_METRICS_COMPUTED.md) 第 3–4 节，
+> 主表 `../four_conditions/ALL_METRICS_FULL.csv`，逐点残差 `../four_conditions/RESIDUALS_LONG.csv`。
+> 45 条标准逐条回填见 `../four_conditions/STANDARDS_COMPUTED.csv`。

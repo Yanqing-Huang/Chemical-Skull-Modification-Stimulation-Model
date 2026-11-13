@@ -55,3 +55,13 @@ calibrated_upper = clip(sim_q95 + p, 0, 1)
   因此**盲目扩大 LHS 采样没有用**。
 - **边界**：逐点覆盖率 ≠ 整条曲线联合覆盖；基线 t=0 与尿素 t=105 无校准区间；
   只报 coverage / width / Winkler，**不报 R² / RMSE**，也不与 TrackA 点预测横比。
+
+<!-- ALL_METRICS_COMPUTED -->
+### 全评价标准实算（本轮新增）
+
+> 区间模型 **TrackB 校准预测区间** 的 R²、RMSE、残差、信息准则、校准、正态性/自相关/异方差检验等
+> 全部指标已实际算出数值，见唯一权威总表
+> [`../docs/ALL_METRICS_COMPUTED.md`](../docs/ALL_METRICS_COMPUTED.md) 第 3–4 节，
+> 主表 `../four_conditions/ALL_METRICS_FULL.csv`，逐点残差 `../four_conditions/RESIDUALS_LONG.csv`。
+> 45 条标准逐条回填见 `../four_conditions/STANDARDS_COMPUTED.csv`。
+> **口径提示**：TrackB 的区间中心 R² / RMSE 已算出（总表第 6.2 节），但标注 `DIAGNOSTIC_ONLY`，**验收仍以 coverage / width / Winkler 为准**，C 类铁律不变。

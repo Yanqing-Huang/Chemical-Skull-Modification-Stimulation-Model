@@ -61,3 +61,12 @@ delta_eff 单调，无法表达尿素 t=105 回升。详见 `../docs/MECHANISM_P
 > `delta_eff` 被稀释 → `delta_eff ∝ f^(-s)`」；早期 121 行概览把 `G_pol(f) ~ (f/F0)^(-s)`
 > 直接写成 CPE 频散，那是对 `delta_eff` 频率因子的**等效简写**，本轮已补全推导并说明
 > `s` 是 CPE 指数在旁路主导近似下的等效值（非被辨识，E9）。
+
+<!-- ALL_METRICS_COMPUTED -->
+### 全评价标准实算（本轮新增）
+
+> 纯机理模型 **A2 纯机理** 的 R²、RMSE、残差、信息准则、校准、正态性/自相关/异方差检验等
+> 全部指标已实际算出数值，见唯一权威总表
+> [`../docs/ALL_METRICS_COMPUTED.md`](../docs/ALL_METRICS_COMPUTED.md) 第 3–4 节，
+> 主表 `../four_conditions/ALL_METRICS_FULL.csv`，逐点残差 `../four_conditions/RESIDUALS_LONG.csv`。
+> 45 条标准逐条回填见 `../four_conditions/STANDARDS_COMPUTED.csv`。

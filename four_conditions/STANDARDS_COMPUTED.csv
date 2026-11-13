@@ -1,0 +1,47 @@
+﻿standard_id,cls,standard,scope,result_type,computed_value,unit,numeric_source,judgement
+A1,A,full 样本内指标,TrackA,定量,0.862820 ~ 0.982404,R²,ALL_METRICS_FULL.csv / level=full / r2,不作数；仅描述样本内拟合程度
+A2,A,LOCO 留一条件,TrackA,定量,0.844815 ~ 0.975069,R²,ALL_METRICS_FULL.csv / level=LOCO,群体均值层，不检验大鼠级泛化
+A3,A,LORO 留一大鼠（验收口径）,TrackA,定量,0.473809 ~ 0.768447,R²,ALL_METRICS_FULL.csv / level=LORO,唯一验收口径
+A4,A,逐鼠 LORO 均值,TrackA,定量,18.00,点/鼠,RESIDUALS_LONG.csv / 按 condition-model-rat 计数,逐鼠结果见 RESIDUAL_GROUP_DIAGNOSTICS.csv
+A5,A,LORO 折数,TrackA,定量,C1/C2=24；C3/C4=12,折,ALL_METRICS_FULL.csv / n folds,折数不同 → 四条件 R² 不可横比
+A6,A,评价集规模,TrackA/TrackB,定量,条件节点 96/48/48/24；鼠级点 576/288/288/144；鼠数 24/24/12/12,点,ALL_METRICS_FULL.csv / n,节点数不同，指标不具可比性
+A7,A,数据版本 gate,全部,判定,PASS（SHA 冻结 + 三层核验）,-,data/data_verification.json,源文件未改动
+A8,A,不利样本保留,全部,定量,24,鼠,RESIDUALS_LONG.csv / rat nunique,WT17 / WT9 / WT8 全部保留，未删除
+B1,B,R²,TrackA,定量,full=0.862820~0.982404; LORO=0.473809~0.768447,-,ALL_METRICS_FULL.csv / r2,1−SSE/SST，越大越好；LORO 层为验收
+B2,B,RMSE,TrackA,定量,full=0.022999~0.078460; LORO=0.092714~0.204750,-,ALL_METRICS_FULL.csv / rmse,sqrt(mean((y−ŷ)²))，越小越好
+B3,B,MAE,TrackA,定量,full=0.018679~0.064129; LORO=0.077503~0.131469,-,ALL_METRICS_FULL.csv / mae,mean(|y−ŷ|)，对离群稳健
+B4,B,bias,TrackA,定量,full=-0.002822~0.001779; LORO=-0.002322~0.001924,-,ALL_METRICS_FULL.csv / bias,mean(y−ŷ)；同时给 bias_pred_minus_obs=−bias 便于对照
+B5,B,AIC,TrackA,定量,full=-527.008698~-127.961012; LORO=-1866.121440~-628.405756,-,ALL_METRICS_FULL.csv / aic,n·ln(SSE/n)+2(k+1)，越小越好；另补 AICc/BIC
+B6,B,k 参数个数,TrackA,定量,full=3.000000~6.000000; LORO=3.000000~6.000000,-,ALL_METRICS_FULL.csv / k,5 / 4 / 3 / 4 / 6
+B7,B,基线 t=0 外推,TrackA,定量,A1.1/A1.3/A2/A3=1.000000；A1.2≈0.899~1.305（需锚定）,R_Z,three_routes_metrics.csv / baseline_pred,A1.2 偏离 1，须人为锚定
+B8,B,参数可辨识性,TrackA,判定,A2 四参数 0 边界命中；A1.2 出现大系数互补,-,docs/MECHANISM_PRINCIPLE.md 原理六,6→5→4 参数化后边界命中降为 0
+B9,B,物理可解释性 / 机理含量,TrackA,判定,A1.1/A1.2/A1.3=无或低；A2=100%；A3=骨架100%+2 校准系数,-,MODEL_DEFINITIONS.md,定性，与 B6/B11 同看
+B10,B,去尿素稳健性,TrackA,定量,本轮已实算：剔除 t=105 后 0/4 条件 LORO 第一名翻转；最大 |ΔR²|=0.029637,R²,"B10_DROP_UREA.csv / rank_flipped, max_abs_delta_r2",B10 标准定义的子集稳健性检验已补算；交付模型冻结参数不变
+B11,B,跨条件零重拟合迁移,A2,定量,C2≈0.947 / C3≈0.932 / C4≈0.953,R²,three_routes_results.json / A2_global_transfer,一套 C1 参数零重拟合迁移
+B12,B,自包含性,TrackA,判定,A1.1/A2/A3 自包含；A1.2/A1.3 需机理先验 CSV,-,各 model.py,包内 data/ 已含机理先验副本
+C1,C,coverage,TrackB 四条件,定量,C1_all=0.908163 / C2_lowfreq=0.913265 / C3_highdose=0.945652 / C4_lf_hd=0.978261,-,TRACKB_FULL_METRICS.csv / coverage,目标 0.90；另给 Wilson 95% CI
+C2,C,mean width,TrackB 四条件,定量,C1_all=0.566151 / C2_lowfreq=0.366206 / C3_highdose=0.549145 / C4_lf_hd=0.376296,-,TRACKB_FULL_METRICS.csv / mean_width,同等覆盖率下越窄越好
+C3,C,median width,TrackB 四条件,定量,C1_all=0.449959 / C2_lowfreq=0.365040 / C3_highdose=0.449959 / C4_lf_hd=0.376733,-,TRACKB_FULL_METRICS.csv / median_width,不受极端宽区间影响
+C4,C,max width,TrackB 四条件,定量,C1_all=1.766339 / C2_lowfreq=0.445945 / C3_highdose=1.141388 / C4_lf_hd=0.445945,-,TRACKB_FULL_METRICS.csv / max_width,高频段显著更宽
+C5,C,Winkler (α=0.10),TrackB 四条件,定量,C1_all=1.011258 / C2_lowfreq=0.453842 / C3_highdose=0.744522 / C4_lf_hd=0.381365,-,TRACKB_FULL_METRICS.csv / winkler_mean,综合覆盖率与宽度
+C6,C,宽度构成 padding 占比,TrackB,定量,97.09%（基础 LHS 3.00%）,%,validation/B1_DIAGNOSTICS.md,宽区间根因是 conformal padding，不是 LHS 参数不确定性
+C7,C,逐点 vs 联合覆盖,TrackB,铁律,逐点覆盖 ≠ 整曲线联合覆盖,-,docs/EVALUATION_CRITERIA.md C7,不可把逐点 0.913 说成整曲线 91.3%
+C8,C,无区间时段,TrackB,判定,"区间覆盖 t=[np.int64(5), np.int64(20), np.int64(35), np.int64(65), np.int64(95)]（无 t=0 / t=105）",min,calibrated_intervals_allfreq_392.csv / global_time_min,绘图须标注灰虚线
+C9,C,padding 公式,TrackB,判定,"p=tolerance_f×q_f；lower=clip(q05−p,0,1)，upper=clip(q95+p,0,1)",-,TrackB/model.py / calibrated_from_raw(),P0 审计复现误差 1.39e−16
+D1,D,时间点画全,fig2–fig5 / 全部图,判定,PASS（已在 fig1–fig15 全图核验）,-,four_conditions/figures/,"7 点 [0,5,20,35,65,95,105]，拟合图 fig2–fig5 全画"
+D2,D,SEM 画全,fig2–fig5 / 全部图,判定,PASS（已在 fig1–fig15 全图核验）,-,four_conditions/figures/,N=6 均值±SEM，未用 SD 冒充
+D3,D,纵轴从 0 起,fig2–fig5 / 全部图,判定,PASS（已在 fig1–fig15 全图核验）,-,four_conditions/figures/,"ylim=(0,1.30)，未裁掉后期低值"
+D4,D,曲线画全,fig2–fig5 / 全部图,判定,PASS（已在 fig1–fig15 全图核验）,-,four_conditions/figures/,5 条 TrackA 模型曲线全部叠加
+D5,D,无遮挡无缺字,fig2–fig5 / 全部图,判定,PASS（已在 fig1–fig15 全图核验）,-,four_conditions/figures/,CJK 字体注册，图例/注释不压数据
+D6,D,位置一致,fig2–fig5 / 全部图,判定,PASS（已在 fig1–fig15 全图核验）,-,four_conditions/figures/,全部位于 four_conditions/figures/
+E1,E,四条件 R² 不可横比,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,评价集 96/48/48/24、折数 24/24/12/12 不同
+E2,E,条件越窄 ≠ 模型越好,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,C4 数字来自评价范围收窄 + 12 鼠小样本
+E3,E,拟合变好 ≠ 机理更正确,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,A1 系列是经验校正，不是机理改进
+E4,E,指标最优 ≠ 可用模型,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,A1.1 样本内最高但 5 参数无物理意义
+E5,E,噪声级差异不声称提升,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,LORO 差 0.002~0.007 远小于逐鼠波动
+E6,E,AIC 罚参数但未做多重比较校正,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,本轮补 AICc/BIC，仍仅作辅助
+E7,E,逐鼠 LORO 方差大,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,个别鼠 R² 为负；逐鼠残差见 RESIDUAL_GROUP_DIAGNOSTICS.csv
+E8,E,尿素 t=105 回升无法表达,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,所有单调模型皆然
+E9,E,s 不是被辨识的 CPE 指数,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,仅 4 个频率点，幂律与 ln(f) 形式统计不可分
+E10,E,三条路线不构成机理被证实,全部,铁律,ACTIVE（口径生效，数值判读均按此执行）,-,docs/EVALUATION_CRITERIA.md 第 1.5 节,物理量由实测标定，不是第一性原理推导
+X1,扩展,全套指标实算一致性校验,全部,判定,"PASS：max|ΔR²|=4.777e-07, max|ΔRMSE|=4.746e-07",-,ALL_METRICS_SUMMARY.json / consistency,证明本轮未改动任何模型/参数/数据

@@ -354,3 +354,36 @@ python make_figures.py              # 重绘 fig1-fig10 拟合效果图
 | `TrackA1/`、`TrackA2/`、`TrackA3/`、`TrackB/README.md` | 各模型定义与本模型成绩单摘要 |
 | `validation/` | LORO / B1 padding 诊断 / 数据差异 / 拟合效果留痕 |
 
+<!-- ALL_METRICS_COMPUTED -->
+## 9. 全评价标准「实算」回填（本轮新增）
+
+> 第 1 节给出的是**标准定义**，第 3–6 节给出的是**原有 5 项汇总指标**。
+> 本轮把 **R² / RMSE / 残差等等全部可计算指标真正算成数值**，覆盖 TrackA 五模型 ×
+> 四条件 × 三验证层级，并逐条回填本文件 45 条标准。
+
+**唯一权威数值总表：[`docs/ALL_METRICS_COMPUTED.md`](ALL_METRICS_COMPUTED.md)
+（同目录 `ALL_METRICS_COMPUTED.md`）**
+
+| 项 | 本轮实算结果 |
+|---|---|
+| 计算规模 | 5 模型 × 4 条件 × 3 层级 = **60 组 × 75 个指标** |
+| 逐点残差 | **8640 行**（`RESIDUALS_LONG.csv`） |
+| 标准回填 | **46 条**全部有实算值/判定（`STANDARDS_COMPUTED.csv`） |
+| 此前未算、本轮补算 | **B10 去尿素稳健性**：0/4 条件 LORO 第一名翻转 |
+| 一致性校验 | **PASS**：60 项复算与冻结值 max absΔR² = 4.777e-07（阈值 1e−5） |
+
+新增指标族（详见总表第 1 节）：调整 R²、NRMSE 三种归一化、MSE/SSE/SST、MedAE、MaxAE、
+MAPE/sMAPE/MPE、**完整残差分布与检验**（分位数、偏度、峰度、Shapiro–Wilk、Jarque–Bera、
+D'Agostino、Anderson–Darling、Durbin–Watson、lag-1 自相关、Breusch–Pagan、White、
+标准化残差离群）、AICc / BIC / log-likelihood、Pearson / Spearman / **Lin CCC**、
+校准回归斜率截距、Theil U1/U2、Willmott d、**MSE 三分解**、按鼠聚类 bootstrap 95% CI、
+TrackB 全套区间指标与 Wilson CI。
+
+> **口径不变**：LORO 仍是唯一验收口径；四条件 R² 不可横比；TrackB 验收仍以
+> coverage / width / Winkler 为准（区间中心的 R² / RMSE 已算出但标注 `DIAGNOSTIC_ONLY`）。
+> 复现：`python compute_all_metrics.py && python make_all_metrics_figures.py && python make_all_metrics_docs.py`。
+
+新增图（位于包内 `four_conditions/figures/`，主 README 已内嵌）：
+`fig13_all_metrics_overview.png`（指标全景）、
+`fig14_residual_diagnostics.png`（残差诊断）、
+`fig15_trackB_and_standards.png`（TrackB 验收 + 标准回填 + 稳健性）。

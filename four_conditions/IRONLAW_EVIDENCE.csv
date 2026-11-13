@@ -1,0 +1,15 @@
+﻿ironlaw_id,ironlaw,evidence_value,unit,numeric_source,note
+E5,C1_all 最优与次优 LORO R² 差,0.033675,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,差异处于噪声级，不得写成性能提升或下降
+E5,C2_lowfreq 最优与次优 LORO R² 差,0.018511,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,差异处于噪声级，不得写成性能提升或下降
+E5,C3_highdose 最优与次优 LORO R² 差,0.039425,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,差异处于噪声级，不得写成性能提升或下降
+E5,C4_lf_hd 最优与次优 LORO R² 差,0.028753,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,差异处于噪声级，不得写成性能提升或下降
+E1,四条件评价集节点数,96 / 48 / 48 / 24,节点,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,折数 24/24/12/12，不可横比
+E2,A3 的 C4 与 C1 LORO R² 差,0.248307,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,来自评价集收窄，不是模型变好
+E4,A1.1 与 A3 样本内最高 R²,A1.1=0.982404 / A3=0.979465,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,样本内第一不代表可外推、可解释
+E7,逐鼠 LORO R²<0 的鼠次,18 / 360 (5.0%),鼠次,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,逐鼠 R² 标准差=0.4624，方差大，仅作参考
+E8,t=105 尿素点 LORO 残差均值,0.040980,R_Z,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,RMSE=0.137553；单调模型系统性无法表达回升
+E6,LORO R² bootstrap 95% CI 平均半宽,0.121221,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,按鼠整簇重采样 1000 次；CI 重叠说明模型差异不显著
+E3,A1 经验层相对 A2 纯机理的样本内 R² 增量,+0.002938,R²,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,经验校正抬高拟合不等于机理更正确
+E9,频率点数,4（100/120/1000/10000 Hz）,点,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,幂律 / ln(f) / 交互形式统计不可分，s 非被辨识的 CPE 指数
+E10,A2 物理参数个数,4（由实测标定）,参数,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,机理驱动指结构来自机理，非全部参数可溯源
+B10,去尿素稳健性排名翻转数,0 / 4,条件,ALL_METRICS_FULL.csv / RESIDUALS_LONG.csv,剔除 t=105 后 LORO 排名是否翻转；详见 B10_DROP_UREA.csv

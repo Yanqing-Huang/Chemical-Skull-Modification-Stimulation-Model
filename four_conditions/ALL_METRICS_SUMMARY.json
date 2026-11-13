@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "data_source": "包内冻结副本 frozen_measured_24rat.csv（与源 SHA256 一致，24 鼠全保留）",
+    "boundary": "未改模型 / 未重新建模 / 未删样本；仅扩展指标计算",
+    "n_models": 5,
+    "n_conditions": 4,
+    "n_levels": 3,
+    "metric_count": 75,
+    "residual_rows": 8640,
+    "standards_count": 46
+  },
+  "consistency": {
+    "max_abs_dr2": 4.776706969966682e-07,
+    "max_abs_drmse": 4.745678637008144e-07,
+    "n_checks": 60,
+    "passed": true
+  },
+  "loro_best_by_condition": {
+    "C1_all": {
+      "model": "A3",
+      "r2": 0.5201404629751671,
+      "rmse": 0.1955283571471502,
+      "mae": 0.1196386132670842
+    },
+    "C2_lowfreq": {
+      "model": "A3",
+      "r2": 0.7326070678396769,
+      "rmse": 0.10461821154339711,
+      "mae": 0.08369197550287674
+    },
+    "C3_highdose": {
+      "model": "A3",
+      "r2": 0.6407985781650702,
+      "rmse": 0.14756566421447265,
+      "mae": 0.10366742836169894
+    },
+    "C4_lf_hd": {
+      "model": "A3",
+      "r2": 0.7684472752870575,
+      "rmse": 0.0927139625504882,
+      "mae": 0.07750283811808899
+    }
+  },
+  "trackb": {
+    "C1_all": {
+      "coverage": 0.9081632653061225,
+      "mean_width": 0.5661507170523887,
+      "winkler": 1.0112575368156287,
+      "diag_center_r2": 0.37760199520618076
+    },
+    "C2_lowfreq": {
+      "coverage": 0.9132653061224489,
+      "mean_width": 0.3662056090165436,
+      "winkler": 0.4538423166368904,
+      "diag_center_r2": 0.7027796270571598
+    },
+    "C3_highdose": {
+      "coverage": 0.9456521739130435,
+      "mean_width": 0.5491450407886456,
+      "winkler": 0.7445217336612034,
+      "diag_center_r2": 0.5325174871702002
+    },
+    "C4_lf_hd": {
+      "coverage": 0.9782608695652174,
+      "mean_width": 0.3762961109640522,
+      "winkler": 0.3813651142548046,
+      "diag_center_r2": 0.7323326285373766
+    },
+    "DELIVERY_lowfreq_196": {
+      "coverage": 0.9132653061224489,
+      "mean_width": 0.3662056090165436,
+      "winkler": 0.4538423166368904,
+      "diag_center_r2": 0.7027796270571598
+    }
+  },
+  "b10_rank_flips": 0,
+  "b10_conditions": 4,
+  "n_standards_quantitative": 22,
+  "n_residual_rows": 8640,
+  "n_per_rat_r2_rows": 360
+}

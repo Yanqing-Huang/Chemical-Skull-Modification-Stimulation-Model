@@ -137,3 +137,49 @@ python make_mechanism_principles.py  # 机理模型原理总纲 MECHANISM_PRINCI
 
 每个 `model.py` 可独立 import 并调用 `predict(dose, t_min, freq_hz)`；
 `TrackA2/model.py`、`TrackA3/model.py`、`TrackA1/A1.1/model.py` 完全自包含，不读外部文件。
+
+<!-- ALL_METRICS_COMPUTED -->
+## 全评价标准实算（本轮新增 · R² / RMSE / 残差等等全部算成数值）
+
+上一轮把 **45 条评价标准写进来**（[`docs/EVALUATION_CRITERIA.md`](docs/EVALUATION_CRITERIA.md)），
+本轮把其中**每一条可计算的标准真正算出数值**：
+
+**唯一权威数值总表：[`docs/ALL_METRICS_COMPUTED.md`](docs/ALL_METRICS_COMPUTED.md)**
+
+- **60 组 × 75 个指标**：5 模型 × 4 条件 × 3 验证层级（`ALL_METRICS_FULL.csv`）
+- **8640 行逐点残差**：每个观测点的观测/预测/残差/标准化残差（`RESIDUALS_LONG.csv`）
+- **残差诊断全套**：分布、Shapiro–Wilk、Jarque–Bera、Durbin–Watson、异方差、离群点、分组偏差
+- **45 条标准逐条回填**（`STANDARDS_COMPUTED.csv`）+ **E 类铁律数值证据**（`IRONLAW_EVIDENCE.csv`）
+- **补算 B10 去尿素稳健性**：0/4 条件 LORO 第一名翻转
+- **一致性校验 PASS**：60 项复算与冻结值 max absΔR² = 4.777e-07，证明零改动
+
+![全指标全景](four_conditions/figures/fig13_all_metrics_overview.png)
+
+![残差诊断](four_conditions/figures/fig14_residual_diagnostics.png)
+
+![TrackB 与标准回填](four_conditions/figures/fig15_trackB_and_standards.png)
+
+| 新增文件 | 内容 |
+|---|---|
+| `four_conditions/ALL_METRICS_FULL.csv` | 全指标主表 |
+| `four_conditions/RESIDUALS_LONG.csv` | 逐点残差 |
+| `four_conditions/RESIDUAL_GROUP_DIAGNOSTICS.csv` | 分组残差诊断 |
+| `four_conditions/PER_RAT_LORO_R2.csv` | 逐鼠 LORO R² |
+| `four_conditions/STANDARDS_COMPUTED.csv` | 45 条标准回填 |
+| `four_conditions/IRONLAW_EVIDENCE.csv` | 铁律数值证据 |
+| `four_conditions/B10_DROP_UREA.csv` | 去尿素稳健性 |
+| `four_conditions/TRACKB_FULL_METRICS.csv` | TrackB 全套 + 诊断性点指标 |
+| `four_conditions/TRACKB_STRATIFIED.csv` | TrackB 分层覆盖率 |
+| `four_conditions/CONSISTENCY_CHECK.csv` | 冻结值逐项比对 |
+| `four_conditions/compute_all_metrics.py` | 可复现计算脚本 |
+
+复现：
+```bash
+cd four_conditions
+python compute_all_metrics.py        # 全套指标（不改模型，含一致性校验）
+python make_all_metrics_figures.py   # fig13 / fig14 / fig15
+python make_all_metrics_docs.py      # 渲染 ALL_METRICS_COMPUTED.md
+```
+
+> **TrackB 口径**：区间中心的 R² / RMSE / 残差已全部算出（总表第 6.2 节），
+> 但标注 `DIAGNOSTIC_ONLY`；验收仍以 coverage / width / Winkler 为准，铁律不变。
