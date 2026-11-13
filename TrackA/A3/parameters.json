@@ -1,0 +1,26 @@
+{
+  "model_id": "TrackA_A3",
+  "formula": "A3 机理融合混合式",
+  "params": [
+    3.303893958223334,
+    0.11515977792763009,
+    0.002911825291608822
+  ],
+  "k": 3,
+  "fit_scope": "C1 全部条件（4 剂量 x 4 频率 x 6 改性时间，96 条件节点）",
+  "baseline_pred_uncorrected": 1.0,
+  "metrics": {
+    "full_r2": 0.865208659286573,
+    "rmse": 0.0784595254321363,
+    "loco_r2": 0.8563602034702147,
+    "loro_r2": 0.4757764446101469,
+    "loro_per_rat_mean_r2": 0.49300623129985494
+  },
+  "four_conditions_loro": {
+    "C1_all": 0.4757764446101469,
+    "C2_lowfreq": 0.6583657565819057,
+    "C3_highdose": 0.5671105787752471,
+    "C4_lf_hd": 0.6840397963415266
+  },
+  "label": "corrected model; empirical calibration, NOT a mechanistic proof"
+}

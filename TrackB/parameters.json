@@ -1,0 +1,51 @@
+{
+  "model_id": "TrackB_calibrated",
+  "target_coverage": 0.9,
+  "alpha_mis": 0.1,
+  "padding": "p_(fold,f) = tolerance_f * q_f",
+  "intervals_allfreq_392": "4 frequencies, used for four-condition slicing",
+  "intervals_lowfreq_196": "100/120 Hz, delivery version",
+  "four_conditions": {
+    "C1_all": {
+      "n_points": 392,
+      "n_rats": 22,
+      "coverage": 0.9081632653061225,
+      "mean_width": 0.5661507170523887,
+      "median_width": 0.4499585005287474,
+      "max_width": 1.7663391326713551,
+      "winkler": 1.0112575368156287,
+      "note": "既有 LOO 校准区间按条件切片；未重新拟合、未重新校准"
+    },
+    "C2_lowfreq": {
+      "n_points": 196,
+      "n_rats": 22,
+      "coverage": 0.9132653061224489,
+      "mean_width": 0.3662056090165436,
+      "median_width": 0.36504047793739847,
+      "max_width": 0.4459446272547013,
+      "winkler": 0.4538423166368904,
+      "note": "既有 LOO 校准区间按条件切片；未重新拟合、未重新校准"
+    },
+    "C3_highdose": {
+      "n_points": 184,
+      "n_rats": 11,
+      "coverage": 0.9456521739130435,
+      "mean_width": 0.5491450407886456,
+      "median_width": 0.4499585005287474,
+      "max_width": 1.1413884250700874,
+      "winkler": 0.7445217336612034,
+      "note": "既有 LOO 校准区间按条件切片；未重新拟合、未重新校准"
+    },
+    "C4_lf_hd": {
+      "n_points": 92,
+      "n_rats": 11,
+      "coverage": 0.9782608695652174,
+      "mean_width": 0.3762961109640522,
+      "median_width": 0.37673267714284076,
+      "max_width": 0.4459446272547013,
+      "winkler": 0.3813651142548046,
+      "note": "既有 LOO 校准区间按条件切片；未重新拟合、未重新校准"
+    }
+  },
+  "label": "NO R2/RMSE for TrackB"
+}

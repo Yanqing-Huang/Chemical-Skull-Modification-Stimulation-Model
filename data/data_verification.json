@@ -1,0 +1,83 @@
+{
+  "L1_file": {
+    "new_excel": "/root/uploads/wb-agentserver-7ec68486-bac8-43da-a17c-e2cd2a4fafde-uploads-1794576/体外EDTA数据记录汇总.xlsx",
+    "new_excel_sha256": "4c165298fbd37ab3c556413ae00dfb8e838e56b37c530e1dd1f0bfc2faa6cd71",
+    "old_excel_sha256": "a6add762ad84a82bb2a767487b949d2f249b32cc01437d0b72910f6df48b0e84",
+    "sheet": "Sheet1 (2)",
+    "new_rows": 295,
+    "new_columns": 21,
+    "unit_row_detected": 2,
+    "unit_row_content": {
+      "E": "MΩ",
+      "Q": "kΩ"
+    },
+    "grid_after_removing_unit_row": 294,
+    "numeric_cells_compared": 2093,
+    "numeric_diff_vs_old_excel_after_shift": 0,
+    "note": "修订版仅新增单位行；+1 行偏移后全部数值一致"
+  },
+  "L2_structure": {
+    "site_rows": 2016,
+    "rat_rows": 672,
+    "condition_rows": 112,
+    "rats": 24,
+    "frequencies_hz": [
+      100,
+      120,
+      1000,
+      10000
+    ],
+    "doses_mol_per_l": [
+      0.05,
+      0.1,
+      0.15,
+      0.2
+    ],
+    "stages": [
+      "baseline",
+      "acetic_acid",
+      "edta_15",
+      "edta_30",
+      "edta_60",
+      "edta_90",
+      "urea_10"
+    ],
+    "sites": [
+      "Bregma",
+      "Lambda",
+      "Midpoint"
+    ],
+    "global_time_min": [
+      0,
+      5,
+      20,
+      35,
+      65,
+      95,
+      105
+    ],
+    "n_rats_per_condition": [
+      6
+    ],
+    "rz_nan": 0,
+    "baseline_rz_all_one": true
+  },
+  "L3_content": {
+    "prev_frozen_sha256": "ddc2df7b2159707191c0a1846ad1626c09d0c3dbdd97fb474547bda3a6333171",
+    "join_rows": 2016,
+    "join_both": 2016,
+    "join_only_new": 0,
+    "join_only_prev": 0,
+    "rz_max_abs_diff": 2.220446049250313e-16,
+    "rz_mean_abs_diff": 1.448012234808418e-17,
+    "cells_with_diff_gt_1e-9": 0
+  },
+  "open_issues": [
+    "14 处 Excel↔measured CSV 值不一致（urea_10/Midpoint/WT21-24/4频率），属局部转录异常，修订版 Excel 数值未改动，故仍未闭环；需回查原始实验记录。",
+    "32 条重复录入（16 组重复键）同样未修订，已在上一轮审计中留痕保留。",
+    "本地 Excel SHA 与上游 manifest 声明的 source_data SHA 不一致，上游原始文件不可得。",
+    "TrackB 校准区间验证集仅 22/24 鼠（缺 WT5 0.10M、WT6 0.15M）。"
+  ],
+  "authoritative_source": "本轮修订版 Excel -> 本脚本重建的 frozen_measured_24rat.csv",
+  "frozen_sha256": "d285a75365279076f87f249b3fdea1afbdb5d981bf817f79a96c3e8941a05ace"
+}

@@ -1,5 +1,0 @@
-frequency_hz,fold_count,available_fold_count,empty_fold_count,degenerate_fold_count,total_point_count,available_point_count,point_coverage,median_interval_width,median_relative_width
-100.0,22,0,22,0,98,0,,,
-120.0,22,0,22,0,98,0,,,
-1000.0,22,0,22,0,98,0,,,
-10000.0,22,0,22,0,98,0,,,
