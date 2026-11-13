@@ -1,6 +1,6 @@
 # 全评价标准实算总表（R² / RMSE / 残差 / 信息准则 / 校准 / 区间 · 全部算进去）
 
-> 本文件是**所有可计算评价标准的唯一数值总表**，与 [`docs/EVALUATION_CRITERIA.md`](EVALUATION_CRITERIA.md) 的 45 条标准一一对应。
+> 本文件是**所有可计算评价标准的唯一数值总表**，与同目录 [`EVALUATION_CRITERIA.md`](EVALUATION_CRITERIA.md) 的 45 条标准一一对应。
 > 上一轮只落盘了 R² / RMSE / MAE / bias / AIC 五项汇总；本轮把**全部指标族实际算出数值**，覆盖 TrackA 五个模型 × 四条件 × 三验证层级，并给出**逐点残差表**与**残差诊断**。
 > 所有数值由 `compute_all_metrics.py` 从冻结参数与冻结数据复算，再由本脚本从落盘 CSV 自动渲染，**未重新建模、未手抄、未改任何模型/参数/数据**。
 
