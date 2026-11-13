@@ -1,0 +1,27 @@
+{
+  "model_id": "TrackA_A1_corrected",
+  "type": "empirical_linear_calibration",
+  "formula": "R_Z_corr = a + b * R_Z_raw",
+  "a": -4.471497120097876,
+  "b": 5.680585691167204,
+  "baseline_anchor_R_Z": 1.0,
+  "fit_scope": {
+    "frequencies_hz": [100, 120],
+    "nodes": 48,
+    "node_definition": "dose x frequency x time condition means, baseline excluded",
+    "target": "observed condition mean of R_Z over 6 rats",
+    "method": "ordinary least squares on (R_Z_raw, observed)"
+  },
+  "cross_check_parameters": {
+    "group_LOCO": {"a": -4.471875802594746, "b": 5.680997572464842},
+    "individual_LORO": {"a": -4.473343733982449, "b": 5.682741880925119}
+  },
+  "metrics": {
+    "A0_raw_n48": {"r2": -7.906, "rmse": 0.533, "mae": 0.510, "bias": -0.510, "pearson_r": 0.885},
+    "A1_full_OLS_n48": {"r2": 0.782, "rmse": 0.083, "mae": 0.069, "bias": 0.000},
+    "A1_group_LOCO_n48": {"r2": 0.762, "rmse": 0.087},
+    "A1_individual_LORO_n288": {"r2": 0.588, "rmse": 0.130, "per_rat_mean_r2": 0.404, "rats_negative_r2": ["WT17", "WT2"]}
+  },
+  "label": "EMPIRICAL correction, NOT a mechanistic improvement",
+  "original_mechanism_unchanged": "sigma = 1e-4 + 1.5*phi^m ; R = sum_i dx_i/(sigma_i*A_i)"
+}
