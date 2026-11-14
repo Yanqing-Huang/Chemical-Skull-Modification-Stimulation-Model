@@ -45,7 +45,7 @@
 |---|---|---|---|---|
 | B1 | R² | 1 − SSE/SST，越大越好，可为负（负 = 不如均值基线） | full / LOCO / LORO 三个层级分别报告 | LORO 层为验收口径 |
 | B2 | RMSE | sqrt(mean((y−ŷ)²))，越小越好，与 R² 互补 | full / LOCO / LORO | 辅助误差量级 |
-| B3 | MAE | mean(|y−ŷ|)，对离群点比 RMSE 稳健 | full | 参考 |
+| B3 | MAE | mean(\|y−ŷ\|)，对离群点比 RMSE 稳健 | full | 参考 |
 | B4 | bias | mean(ŷ−y)，检验系统性高估/低估 | full | 参考；本项目各模型接近 0 |
 | B5 | AIC | n·ln(SSE/n)+2k（高斯误差，忽略与模型无关常数）；实现见 `run_three_routes.py`，**越小越好** | full | **已对参数个数 k 施加惩罚**；但未做多重比较校正（E6） |
 | B6 | k 参数个数 | 自由参数数目（5 / 4 / 3 / 4 / 6） | 全部 | 越少越利于外推；须与 B5 同看 |

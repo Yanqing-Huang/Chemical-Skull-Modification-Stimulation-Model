@@ -39,7 +39,7 @@
 - 全部 14 处集中在 **urea_10 / Midpoint / WT21-24 / 4 频率**——即第 2 节重复录入的组，且 Excel 两遍录入的值彼此也不同（如 WT21/100Hz 录 11 与 14，CSV 取 14）。
 - 性质判定：**局部转录异常**（transcription anomaly），非系统性偏移。上游原始文件 `raw_file_in_repository=false` 不可得，**无法回查原始实验记录**，故标记为 `UNRESOLVED_TRANSCRIPTION` 并保留，不以任何一侧覆盖另一侧用于分析口径。
 
-| rat | site | freq | stage | Excel值 | measured CSV值 | |Δ| |
+| rat | site | freq | stage | Excel值 | measured CSV值 | \|Δ\| |
 |---|---|---|---|---|---|---|
 | WT21 | Midpoint | 100 | urea_10 | 11.0 | 14.0 | 3.0 |
 | WT21 | Midpoint | 120 | urea_10 | 10.0 | 12.0 | 2.0 |

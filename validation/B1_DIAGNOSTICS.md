@@ -18,14 +18,14 @@
 
 ### 3.1 按 ensemble_role
 
-| role | n | coverage | mean_width | mean_pad_share | mean_winkler | mean|resid| |
+| role | n | coverage | mean_width | mean_pad_share | mean_winkler | mean\|resid\| |
 |---|---|---|---|---|---|---|
 | NEAREST_TRAINING_ENSEMBLE_NOT_ORIGINAL_COMPATIBLE_SET | 98 | 0.969 | 0.3564 | 0.990 | 0.3630 | 0.0818 |
 | TRAINING_COMPATIBLE_ENSEMBLE | 98 | 0.857 | 0.3760 | 0.951 | 0.4570 | 0.1018 |
 
 ### 3.2 按频率 / 阶段 / 剂量
 
-| 分层 | stratum | n | coverage | mean_width | mean_pad_share | mean|resid| |
+| 分层 | stratum | n | coverage | mean_width | mean_pad_share | mean\|resid\| |
 |---|---|---|---|---|---|---|
 | frequency_hz | 100.0 | 98 | 0.918 | 0.3690 | 0.972 | 0.0926 |
 | frequency_hz | 120.0 | 98 | 0.908 | 0.3634 | 0.970 | 0.0909 |

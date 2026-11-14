@@ -1,0 +1,5 @@
+﻿condition,n_points,n_rats,coverage,coverage_wilson_lo,coverage_wilson_hi,target_coverage,mean_width,median_width,min_width,max_width,winkler_mean,n_miss,miss_below,miss_above,padding_share_of_width,diag_center_r2,diag_center_rmse,diagnostic_notice,condition_scope
+C1_all,392,22,0.90816327,0.87547811,0.93292635,0.9,0.56615072,0.4499585,0.29200882,1.7663391,1.0112575,36,12,24,0.9709,0.377602,0.23702013,DIAGNOSTIC_ONLY: 区间中心点不是点预测模型；TrackB 验收仍以 coverage/width/Winkler 为准，铁律不变,所有条件
+C2_lowfreq,196,22,0.91326531,0.86549972,0.94514288,0.9,0.36620561,0.36504048,0.29200882,0.44594463,0.45384232,17,10,7,0.9709,0.70277963,0.11110432,DIAGNOSTIC_ONLY: 区间中心点不是点预测模型；TrackB 验收仍以 coverage/width/Winkler 为准，铁律不变,低频切片
+C3_highdose,184,11,0.94565217,0.90286195,0.97021474,0.9,0.54914504,0.4499585,0.32313725,1.1413884,0.74452173,10,2,8,0.9709,0.53251749,0.17370707,DIAGNOSTIC_ONLY: 区间中心点不是点预测模型；TrackB 验收仍以 coverage/width/Winkler 为准，铁律不变,高浓度切片
+C4_lf_hd,92,11,0.97826087,0.92416506,0.99401796,0.9,0.37629611,0.37673268,0.32313725,0.44594463,0.38136511,2,1,1,0.9709,0.73233263,0.1003003,DIAGNOSTIC_ONLY: 区间中心点不是点预测模型；TrackB 验收仍以 coverage/width/Winkler 为准，铁律不变,最佳条件范围
